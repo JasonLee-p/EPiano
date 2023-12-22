@@ -3,7 +3,7 @@
 layout (location = 0) in vec2 position;
 out vec2 TexCoord;
 
-uniform mat4 projection;  // 添加这一行
+uniform mat4 projection;
 
 void main()
 {

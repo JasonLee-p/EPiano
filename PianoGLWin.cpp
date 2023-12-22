@@ -1,7 +1,9 @@
 #include "PianoGLWin.h"
 
-#define DRAW_TRIANGLE_STRIP program->enableAttributeArray(0); program->setAttributeBuffer(0, GL_FLOAT, 0, 2, 0); glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+#define CHECK_UPDATE if (updating) return; updating = true;
+#define END_UPDATE updating = false;
 
+const float FLOAT_EMPTY8[8] = { -10, -10, -10, -10, -10, -10, -10, -10 };
 
 PianoGLWin::PianoGLWin(QWidget* parent)
 	: QOpenGLWidget(parent)
@@ -84,7 +86,9 @@ void PianoGLWin::initPiano(int w, int h)
 
 	// 初始化数组对象
 	float vertices_wkLine[55 * 4] = {};
-	float vertices_bk[36 * 8] = {};
+	float vertices_wk[8 * 52] = {};
+	float vertices_bk[8 * 36] = {};
+
 
 	// 白键边框（竖线）的数组
 	for (int i = 0; i < 53; i++) {
@@ -103,32 +107,32 @@ void PianoGLWin::initPiano(int w, int h)
 	vertices_wkLine[_base + 5] = 0.5;
 	vertices_wkLine[_base + 6] = w;
 	vertices_wkLine[_base + 7] = 0.5;
-
-
-	// 黑键的数组
+	// 键盘的数组
+	int wi = 0;
 	int bi = 0;
 	for (int i = 0; i < 88; i++) {
 		keys[i] = Key(i + 21);
-		if (!keys[i].isWhite) {
-			keys[i].paintPosX = (i - bi) * WKWidth - BKWidth / 2;
-			int base = bi * 8;
-			vertices_bk[base] = keys[i].paintPosX;
-			vertices_bk[base + 1] = 0;
-			vertices_bk[base + 2] = keys[i].paintPosX;
-			vertices_bk[base + 3] = BKHeight;
-			vertices_bk[base + 4] = keys[i].paintPosX + BKWidth;
-			vertices_bk[base + 5] = 0;
-			vertices_bk[base + 6] = keys[i].paintPosX + BKWidth;
-			vertices_bk[base + 7] = BKHeight;
-			bi++;
+		if (keys[i].isWhite) {
+			keys[i].paintPosX = (i - bi) * WKWidth;
+			keys[i].index = wi;
+			int base = wi * 8;
+			vertices_wk[base] = keys[i].paintPosX;                 vertices_wk[base + 1] = 0;
+			vertices_wk[base + 2] = keys[i].paintPosX;             vertices_wk[base + 3] = WKHeight;
+			vertices_wk[base + 4] = keys[i].paintPosX + WKWidth;   vertices_wk[base + 5] = 0;
+			vertices_wk[base + 6] = keys[i].paintPosX + WKWidth;   vertices_wk[base + 7] = WKHeight;
+			wi++;
 		}
 		else {
-			keys[i].paintPosX = (i - bi) * WKWidth;
+			keys[i].paintPosX = (i - bi) * WKWidth - BKWidth / 2;
+			keys[i].index = bi;
+			int base = bi * 8;
+			vertices_bk[base] = keys[i].paintPosX;				   vertices_bk[base + 1] = 0;
+			vertices_bk[base + 2] = keys[i].paintPosX;			   vertices_bk[base + 3] = BKHeight;
+			vertices_bk[base + 4] = keys[i].paintPosX + BKWidth;   vertices_bk[base + 5] = 0;
+			vertices_bk[base + 6] = keys[i].paintPosX + BKWidth;   vertices_bk[base + 7] = BKHeight;
+			bi++;
 		}
 	}
-
-	// 被悬浮的键的数组
-	float vertices_hk[8] = {-10, -10, -10, -10, -10, -10, -10, -10};
 
 	// 创建并绑定 vbo
 	vbo_wkLine = new QOpenGLBuffer(QOpenGLBuffer::VertexBuffer);
@@ -139,40 +143,46 @@ void PianoGLWin::initPiano(int w, int h)
 	vbo_bk = new QOpenGLBuffer(QOpenGLBuffer::VertexBuffer);
 	vbo_bk->create();
 	vbo_bk->bind();
-	vbo_bk->allocate(vertices_bk, 36 * 8 * sizeof(float));
+	vbo_bk->allocate(vertices_bk, 8 * 36 * sizeof(float));
 
-	vbo_hoveredKey = new QOpenGLBuffer(QOpenGLBuffer::VertexBuffer);
-	vbo_hoveredKey->create();
-	vbo_hoveredKey->bind();
-	vbo_hoveredKey->allocate(vertices_hk, 4 * 2 * sizeof(float));
+	vbo_wk = new QOpenGLBuffer(QOpenGLBuffer::VertexBuffer);
+	vbo_wk->create();
+	vbo_wk->bind();
+	vbo_wk->allocate(vertices_wk, 8 * 52 * sizeof(float));
+}
 
-	// 解绑 vbo
-	vbo_wkLine->release();
-	vbo_bk->release();
+void PianoGLWin::updatePressedKeys(std::vector<Key*>& pressedKeys)
+{
+	// 更新vbo_pressedWkeys
 }
 
 
-void PianoGLWin::updateHoveredKey(Key* key)
+void PianoGLWin::drawLines(QOpenGLBuffer* vbo, int start, int count, QVector4D color)
 {
-	if (key == nullptr) return;
-	// 更新vbo_hoveredKey
-	hoveredKey = key;
-    float vertices_hk[8];
-	if (key->isWhite) {
-		vertices_hk[0] = key->paintPosX;                  vertices_hk[1] = 0;
-		vertices_hk[2] = key->paintPosX;                  vertices_hk[3] = WKHeight;
-		vertices_hk[4] = key->paintPosX + WKWidth;        vertices_hk[5] = 0;
-		vertices_hk[6] = key->paintPosX + WKWidth;        vertices_hk[7] = WKHeight;
+	program->setUniformValue(colorLocation, color);
+	vbo->bind();
+	program->enableAttributeArray(0);
+	program->setAttributeBuffer(0, GL_FLOAT, 0, 2, 0);
+	glDrawArrays(GL_LINES, start, count);
+	vbo->release();
+}
+
+
+void PianoGLWin::drawKeyRange(QOpenGLBuffer* vbo, int start, int count, QVector4D color, bool inLoop=false)
+{
+	program->setUniformValue(colorLocation, color);
+	vbo->bind();
+	program->enableAttributeArray(0);
+	program->setAttributeBuffer(0, GL_FLOAT, 0, 2, 0);
+	if (inLoop) {
+		for (int i = 0; i < count; i += 4) {
+			glDrawArrays(GL_TRIANGLE_STRIP, start + i, 4);
+		}
 	}
 	else {
-		vertices_hk[0] = key->paintPosX;                  vertices_hk[1] = 0;
-		vertices_hk[2] = key->paintPosX;                  vertices_hk[3] = BKHeight;
-		vertices_hk[4] = key->paintPosX + BKWidth;        vertices_hk[5] = 0;
-		vertices_hk[6] = key->paintPosX + BKWidth;        vertices_hk[7] = BKHeight;
+		glDrawArrays(GL_TRIANGLE_STRIP, start, count);
 	}
-	vbo_hoveredKey->bind();
-	vbo_hoveredKey->write(0, vertices_hk, 4 * 2 * sizeof(float));
-	vbo_hoveredKey->release();
+	vbo->release();
 }
 
 
@@ -180,54 +190,34 @@ void PianoGLWin::paintPiano()
 {
 	// 绘制鼠标悬浮的白键
 	if (hoveredKey != nullptr && hoveredKey->isWhite) {
-		program->setUniformValue(colorLocation, WHITE_HOVERED);
-		vbo_hoveredKey->bind();
-		DRAW_TRIANGLE_STRIP
-		vbo_hoveredKey->release();
+		drawKeyRange(vbo_wk, hoveredKey->index * 4, 4, WHITE_HOVERED);
 	}
 
 	// 绘制被按下的白键
-	program->setUniformValue(colorLocation, WHITE_PRESSED);
-	for (int i = 0; i < pressedKeys.size(); i++) {
-		if (pressedKeys[i]->isWhite) {
-			vbo_hoveredKey->bind();
-			DRAW_TRIANGLE_STRIP
-			vbo_hoveredKey->release();
-		}
+	if (mousePressedKey != nullptr && mousePressedKey->isWhite) {
+		drawKeyRange(vbo_wk, mousePressedKey->index * 4, 4, WHITE_PRESSED);
+	}
+	if (pressedWkeys.size() > 0) {
+		// TODO
 	}
 
 	// 绘制白键边线
-	program->setUniformValue(colorLocation, BLACK);
-	vbo_wkLine->bind();
-	program->enableAttributeArray(0);
-	program->setAttributeBuffer(0, GL_FLOAT, 0, 2, 0);
-	glDrawArrays(GL_LINES, 0, 55 * 2);
-	vbo_wkLine->release();
+	drawLines(vbo_wkLine, 0, 55 * 2, BLACK);
 
 	// 绘制黑键
-	program->setUniformValue(colorLocation, BLACK);
-	vbo_bk->bind();
-	program->enableAttributeArray(0);
-	program->setAttributeBuffer(0, GL_FLOAT, 0, 2, 0);
-	for (int i = 0; i < 36; i++) glDrawArrays(GL_TRIANGLE_STRIP, i * 4, 4);
-	vbo_bk->release();
+	drawKeyRange(vbo_bk, 0, 36 * 4, BLACK, true);
 
 	// 绘制鼠标悬浮的黑键
 	if (hoveredKey != nullptr && !hoveredKey->isWhite) {
-		program->setUniformValue(colorLocation, BLACK_HOVERED);
-		vbo_hoveredKey->bind();
-		DRAW_TRIANGLE_STRIP
-		vbo_hoveredKey->release();
+		drawKeyRange(vbo_bk, hoveredKey->index * 4, 4, BLACK_HOVERED);
 	}
 
 	// 绘制被按下的黑键
-	program->setUniformValue(colorLocation, BLACK_PRESSED);
-	for (int i = 0; i < pressedKeys.size(); i++) {
-		if (!pressedKeys[i]->isWhite) {
-			vbo_hoveredKey->bind();
-			DRAW_TRIANGLE_STRIP
-			vbo_hoveredKey->release();
-		}
+	if (mousePressedKey != nullptr && !mousePressedKey->isWhite) {
+		drawKeyRange(vbo_bk, mousePressedKey->index * 4, 4, BLACK_PRESSED);
+	}
+	if (pressedBkeys.size() > 0) {
+		// TODO
 	}
 }
 
@@ -255,20 +245,15 @@ void PianoGLWin::mouseMoveEvent(QMouseEvent* event)
 	int posX = event->pos().x();
 	int posY = event->pos().y();
 	Key* tmp_key = findKey(posX, posY);
-	if (event->buttons() == Qt::MouseButton::LeftButton) { // 鼠标左键按下，更新被按下的键
+	// 鼠标左键按下，更新被按下的键
+	if (event->buttons() == Qt::MouseButton::LeftButton) {
 		mousePressedKey = tmp_key;
-		tmp_key = nullptr;
+		hoveredKey = nullptr;
 	}
-	// 更新vbo_hoveredKey
-	float vertices_hk[8];
-	if (tmp_key == nullptr) {
-		vertices_hk[0] = vertices_hk[1] = vertices_hk[2] = vertices_hk[3] = vertices_hk[4] = vertices_hk[5] = vertices_hk[6] = vertices_hk[7] = -10;
-		vbo_hoveredKey->bind();
-		vbo_hoveredKey->write(0, vertices_hk, 4 * 2 * sizeof(float));
-		vbo_hoveredKey->release();
-	}
-	else if (tmp_key != hoveredKey) {
-		updateHoveredKey(tmp_key);
+	// 鼠标左键未按下，更新悬浮的键
+	else {
+		hoveredKey = tmp_key;
+		mousePressedKey = nullptr;
 	}
 	// 更新画面
 	update();
@@ -279,11 +264,13 @@ void PianoGLWin::mousePressEvent(QMouseEvent* event)
 	// 监测当前鼠标所在的键
 	int posX = event->pos().x();
 	int posY = event->pos().y();
-	Key* tmp_key = findKey(posX, posY);
-	// 置空被悬浮的键
-	hoveredKey = nullptr;
-	if (event->buttons() == Qt::MouseButton::LeftButton) { // 鼠标左键按下，更新被按下的键
-		mousePressedKey = tmp_key;
+	// 左键按下，更新被按下的键
+	if (event->buttons() == Qt::MouseButton::LeftButton) {
+		if (hoveredKey != nullptr) {
+			mousePressedKey = hoveredKey;
+			hoveredKey = nullptr;
+			mousePressedKey->play();
+		}
 	}
 	// 更新画面
 	update();
@@ -294,20 +281,41 @@ void PianoGLWin::mouseReleaseEvent(QMouseEvent* event)
 	// 监测当前鼠标所在的键
 	int posX = event->pos().x();
 	int posY = event->pos().y();
-	Key* tmp_key = findKey(posX, posY);
-	// 更新vbo_hoveredKey
-	float vertices_hk[8];
-	if (tmp_key == nullptr) {
-		vertices_hk[0] = vertices_hk[1] = vertices_hk[2] = vertices_hk[3] = vertices_hk[4] = vertices_hk[5] = vertices_hk[6] = vertices_hk[7] = -10;
-		vbo_hoveredKey->bind();
-		vbo_hoveredKey->write(0, vertices_hk, 4 * 2 * sizeof(float));
-		vbo_hoveredKey->release();
-	}
-	else updateHoveredKey(tmp_key);
-	if (event->buttons() == Qt::MouseButton::LeftButton) { // 鼠标左键释放，更新被按下的键
-		mousePressedKey = nullptr;
+	// 左键释放，更新被按下的键
+	if (event->button() == Qt::MouseButton::LeftButton) {
+		if (mousePressedKey != nullptr) {
+			mousePressedKey->stop();
+			hoveredKey = mousePressedKey;
+			mousePressedKey = nullptr;
+		}
 	}
 	// 更新画面
 	update();
+}
+
+void PianoGLWin::add_pressedKeys(std::vector<Key*>& pressedKeys)
+{
+	for (int i = 0; i < pressedKeys.size(); i++) {
+		if (pressedKeys[i]->isWhite) {
+			pressedWkeys.push_back(pressedKeys[i]);
+		}
+		else {
+			pressedBkeys.push_back(pressedKeys[i]);
+		}
+	}
+	// 更新主界面的按键内容显示Label
+}
+
+void PianoGLWin::remove_pressedKeys(std::vector<Key*>& pressedKeys)
+{
+	for (int i = 0; i < pressedKeys.size(); i++) {
+		if (pressedKeys[i]->isWhite) {
+			pressedWkeys.erase(std::remove(pressedWkeys.begin(), pressedWkeys.end(), pressedKeys[i]), pressedWkeys.end());
+		}
+		else {
+			pressedBkeys.erase(std::remove(pressedBkeys.begin(), pressedBkeys.end(), pressedKeys[i]), pressedBkeys.end());
+		}
+	}
+	// 更新主界面的按键内容显示Label
 }
 

@@ -81,7 +81,71 @@ color: rgb(0, 4, 39);</string>
         <number>0</number>
        </property>
        <item>
-        <widget class="QWidget" name="leftWidget" native="true"/>
+        <widget class="QWidget" name="leftWidget" native="true">
+         <layout class="QHBoxLayout" name="horizontalLayout">
+          <property name="spacing">
+           <number>0</number>
+          </property>
+          <property name="leftMargin">
+           <number>44</number>
+          </property>
+          <property name="topMargin">
+           <number>0</number>
+          </property>
+          <property name="rightMargin">
+           <number>0</number>
+          </property>
+          <property name="bottomMargin">
+           <number>0</number>
+          </property>
+          <item>
+           <widget class="QLabel" name="label">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="font">
+             <font>
+              <pointsize>14</pointsize>
+             </font>
+            </property>
+            <property name="text">
+             <string>当前音符：</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLabel" name="label_2">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="MinimumExpanding" vsizetype="Preferred">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="font">
+             <font>
+              <pointsize>24</pointsize>
+             </font>
+            </property>
+            <property name="text">
+             <string>N</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QFrame" name="frame">
+            <property name="frameShape">
+             <enum>QFrame::StyledPanel</enum>
+            </property>
+            <property name="frameShadow">
+             <enum>QFrame::Raised</enum>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
        </item>
        <item>
         <widget class="QWidget" name="rightWidget" native="true"/>
@@ -119,7 +183,13 @@ color: rgb(0, 4, 39);</string>
      <height>22</height>
     </rect>
    </property>
+   <property name="styleSheet">
+    <string notr="true"/>
+   </property>
    <widget class="QMenu" name="settingMenu">
+    <property name="styleSheet">
+     <string notr="true">background-color: rgb(255, 240, 240);</string>
+    </property>
     <property name="title">
      <string>设置</string>
     </property>
@@ -127,6 +197,9 @@ color: rgb(0, 4, 39);</string>
     <addaction name="themeSetting"/>
    </widget>
    <widget class="QMenu" name="aboutMenu">
+    <property name="styleSheet">
+     <string notr="true">background-color: rgb(255, 240, 240);</string>
+    </property>
     <property name="title">
      <string>关于</string>
     </property>

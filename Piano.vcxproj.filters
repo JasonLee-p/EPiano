@@ -97,4 +97,9 @@
       <Filter>Header Files\widgets</Filter>
     </QtMoc>
   </ItemGroup>
+  <ItemGroup>
+    <QtUic Include="oiSetting.ui">
+      <Filter>Form Files</Filter>
+    </QtUic>
+  </ItemGroup>
 </Project>

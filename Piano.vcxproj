@@ -103,6 +103,7 @@
     <QtMoc Include="MainWin.h" />
     <ClCompile Include="MainWin.cpp" />
     <ClCompile Include="main.cpp" />
+    <QtUic Include="oiSetting.ui" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="key.h" />

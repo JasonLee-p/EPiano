@@ -229,7 +229,6 @@ void PianoGLWin::paintPiano()
 			vbo_hoveredKey->release();
 		}
 	}
-
 }
 
 Key* PianoGLWin::findKey(int x, int y)

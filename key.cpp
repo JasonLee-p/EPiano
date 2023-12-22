@@ -4,6 +4,7 @@
 #define NMOD keyNumber % 12
 #define note_IS_WHITE_KEY (NMOD == 0 || NMOD == 2 || NMOD == 4 || NMOD == 5 || NMOD == 7 || NMOD == 9 || NMOD == 11)
 
+
 MidiDeviceHandler* Key::midiDeviceHandler = nullptr;
 
 

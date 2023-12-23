@@ -2,6 +2,7 @@
 #include <Windows.h>
 #include <iostream>
 
+#include "note.h"
 #include "packages/RtMidi.h"
 
 
@@ -37,6 +38,6 @@ public:
 
 	static void midiCallback(double deltatime, std::vector<unsigned char>* message, void* userData);	// midi回调函数
 
-	void noteOn(int noteNumber, int velocity);		// 按下音符
-	void noteOff(int noteNumber, int velocity);		// 松开音符
+	void noteOn(Note& note, int velocity);			// 按下音符
+	void noteOff(Note& note, int velocity);			// 松开音符
 };

@@ -14,7 +14,6 @@ MidiDeviceHandler::~MidiDeviceHandler() {
     if (midiin) {
         delete midiin;
     }
-
     if (midiout) {
         delete midiout;
     }
@@ -77,9 +76,7 @@ void MidiDeviceHandler::openAudioPort(unsigned int port) {
 
     try {
         // 使用Windows API打开音频设备
-        //
         std::cout << "Opening audio port: " << port << std::endl;
-
         audioPort = port;
     }
     catch (std::exception& error) {
@@ -122,6 +119,7 @@ void MidiDeviceHandler::sendMessage(std::vector<unsigned char>* message, unsigne
         try {
             midiout->openPort(port);
             midiout->sendMessage(message);
+
             midiout->closePort();
         }
         catch (RtMidiError& error) {
@@ -139,20 +137,22 @@ void MidiDeviceHandler::midiCallback(double deltatime, std::vector<unsigned char
     std::cout << std::dec << std::endl;
 }
 
-void MidiDeviceHandler::noteOn(int noteNumber, int velocity) {
+void MidiDeviceHandler::noteOn(Note& note, int velocity) {
 	// 按下音符
 	std::vector<unsigned char> message;
 	message.push_back(0x90);
-	message.push_back(noteNumber);
+	message.push_back(note.midiNumber);
 	message.push_back(velocity);
 	sendMessage(&message);
+    // 播放音符
+    
 }
 
-void MidiDeviceHandler::noteOff(int noteNumber, int velocity) {
+void MidiDeviceHandler::noteOff(Note& note, int velocity) {
 	// 松开音符
 	std::vector<unsigned char> message;
 	message.push_back(0x80);
-	message.push_back(noteNumber);
+	message.push_back(note.midiNumber);
 	message.push_back(velocity);
 	sendMessage(&message);
 }

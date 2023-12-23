@@ -67,6 +67,9 @@
     <ClCompile Include="packages\RtMidi.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="chord.cpp">
+      <Filter>Source Files\musicElements</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="key.h">
@@ -80,6 +83,9 @@
     </ClInclude>
     <ClInclude Include="packages\RtMidi.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="chord.h">
+      <Filter>Header Files\musicElements</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

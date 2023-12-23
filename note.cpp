@@ -1,4 +1,5 @@
 #include"note.h"
+
 std::map<int, std::string> Note::PITCH_CLASS2NAME = {
 	   {0, std::string("C")},
 	   {1, std::string("C#")},
@@ -13,3 +14,4 @@ std::map<int, std::string> Note::PITCH_CLASS2NAME = {
 	   {10, std::string("A#")},
 	   {11, std::string("B")}
 };
+

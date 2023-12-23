@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1400</width>
-    <height>360</height>
+    <height>331</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -66,37 +66,49 @@ color: rgb(0, 4, 39);</string>
      <widget class="QWidget" name="widget" native="true">
       <layout class="QHBoxLayout" name="horizontalLayout_2">
        <property name="spacing">
-        <number>0</number>
+        <number>15</number>
        </property>
        <property name="leftMargin">
-        <number>0</number>
+        <number>30</number>
        </property>
        <property name="topMargin">
-        <number>0</number>
+        <number>15</number>
        </property>
        <property name="rightMargin">
-        <number>0</number>
+        <number>30</number>
        </property>
        <property name="bottomMargin">
-        <number>0</number>
+        <number>15</number>
        </property>
        <item>
         <widget class="QWidget" name="leftWidget" native="true">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="minimumSize">
+          <size>
+           <width>300</width>
+           <height>0</height>
+          </size>
+         </property>
          <layout class="QHBoxLayout" name="horizontalLayout">
           <property name="spacing">
-           <number>0</number>
+           <number>15</number>
           </property>
           <property name="leftMargin">
-           <number>44</number>
+           <number>15</number>
           </property>
           <property name="topMargin">
-           <number>0</number>
+           <number>15</number>
           </property>
           <property name="rightMargin">
-           <number>0</number>
+           <number>15</number>
           </property>
           <property name="bottomMargin">
-           <number>0</number>
+           <number>15</number>
           </property>
           <item>
            <widget class="QLabel" name="label">
@@ -105,6 +117,12 @@ color: rgb(0, 4, 39);</string>
               <horstretch>0</horstretch>
               <verstretch>0</verstretch>
              </sizepolicy>
+            </property>
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>0</height>
+             </size>
             </property>
             <property name="font">
              <font>
@@ -117,31 +135,109 @@ color: rgb(0, 4, 39);</string>
            </widget>
           </item>
           <item>
-           <widget class="QLabel" name="label_2">
+           <widget class="QFrame" name="frame">
             <property name="sizePolicy">
-             <sizepolicy hsizetype="MinimumExpanding" vsizetype="Preferred">
+             <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
               <horstretch>0</horstretch>
               <verstretch>0</verstretch>
              </sizepolicy>
             </property>
-            <property name="font">
-             <font>
-              <pointsize>24</pointsize>
-             </font>
+            <property name="minimumSize">
+             <size>
+              <width>100</width>
+              <height>0</height>
+             </size>
             </property>
-            <property name="text">
-             <string>N</string>
+            <property name="sizeIncrement">
+             <size>
+              <width>0</width>
+              <height>0</height>
+             </size>
             </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QFrame" name="frame">
+            <property name="baseSize">
+             <size>
+              <width>100</width>
+              <height>0</height>
+             </size>
+            </property>
+            <property name="focusPolicy">
+             <enum>Qt::NoFocus</enum>
+            </property>
+            <property name="styleSheet">
+             <string notr="true">background-color: rgb(255, 255, 255);
+border-radius: 10px;
+
+</string>
+            </property>
             <property name="frameShape">
              <enum>QFrame::StyledPanel</enum>
             </property>
             <property name="frameShadow">
              <enum>QFrame::Raised</enum>
             </property>
+            <layout class="QVBoxLayout" name="verticalLayout">
+             <property name="spacing">
+              <number>4</number>
+             </property>
+             <property name="leftMargin">
+              <number>22</number>
+             </property>
+             <property name="topMargin">
+              <number>16</number>
+             </property>
+             <property name="rightMargin">
+              <number>22</number>
+             </property>
+             <property name="bottomMargin">
+              <number>14</number>
+             </property>
+             <item>
+              <widget class="QFrame" name="frame_2">
+               <property name="frameShape">
+                <enum>QFrame::StyledPanel</enum>
+               </property>
+               <property name="frameShadow">
+                <enum>QFrame::Raised</enum>
+               </property>
+               <layout class="QHBoxLayout" name="horizontalLayout_3">
+                <property name="spacing">
+                 <number>0</number>
+                </property>
+                <property name="leftMargin">
+                 <number>0</number>
+                </property>
+                <property name="topMargin">
+                 <number>0</number>
+                </property>
+                <property name="rightMargin">
+                 <number>0</number>
+                </property>
+                <property name="bottomMargin">
+                 <number>0</number>
+                </property>
+                <item>
+                 <widget class="QLabel" name="currentNotes">
+                  <property name="font">
+                   <font>
+                    <pointsize>22</pointsize>
+                   </font>
+                  </property>
+                  <property name="text">
+                   <string>None</string>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
+              </widget>
+             </item>
+             <item>
+              <widget class="QLabel" name="currentType">
+               <property name="text">
+                <string>None</string>
+               </property>
+              </widget>
+             </item>
+            </layout>
            </widget>
           </item>
          </layout>

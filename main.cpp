@@ -3,6 +3,8 @@
 #include "MidiDeviceHandler.h"
 #include <QtWidgets/QApplication>
 
+void about() {}
+
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);

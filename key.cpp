@@ -7,7 +7,6 @@
 
 MidiDeviceHandler* Key::midiDeviceHandler = nullptr;
 
-
 Key::Key(int keyNumber) : keyNumber(keyNumber) {
 	note = Note(keyNumber);
 	isWhite = note_IS_WHITE_KEY;
@@ -17,10 +16,10 @@ Key::~Key() {}
 
 void Key::play() {
 	pressed = true;
-	midiDeviceHandler->noteOn(keyNumber, 127);
+	midiDeviceHandler->noteOn(note, 127);
 }
 
 void Key::stop() {
-	midiDeviceHandler->noteOff(keyNumber, 127);
+	midiDeviceHandler->noteOff(note, 127);
 	pressed = false;
 }

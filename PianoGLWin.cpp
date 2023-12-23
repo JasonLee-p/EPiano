@@ -2,8 +2,9 @@
 
 #define CHECK_UPDATE if (updating) return; updating = true;
 #define END_UPDATE updating = false;
+constexpr auto PIANO_ORG_WIDTH = 1400;
+constexpr auto PIANO_ORG_HEIGHT = 140;
 
-const float FLOAT_EMPTY8[8] = { -10, -10, -10, -10, -10, -10, -10, -10 };
 
 PianoGLWin::PianoGLWin(QWidget* parent)
 	: QOpenGLWidget(parent)
@@ -26,7 +27,10 @@ void PianoGLWin::initializeGL()
 
 	colorLocation = program->uniformLocation("color");
 
-	initPiano(width(), height());
+	setPiano(width(), height(), true);
+	QMatrix4x4 projectionMatrix;
+	projectionMatrix.ortho(0.0f, static_cast<float>(width()), static_cast<float>(height()), 0.0f, -1.0f, 1.0f);
+	program->setUniformValue("projection", projectionMatrix);
 
 	vao = new QOpenGLVertexArrayObject();
 	vao->create();
@@ -44,17 +48,12 @@ void PianoGLWin::initializeGL()
 
 	vao->release();
 
-	// 设置正交投影矩阵
-	QMatrix4x4 projectionMatrix;
-	projectionMatrix.ortho(0.0f, static_cast<float>(width()), static_cast<float>(height()), 0.0f, -1.0f, 1.0f);
-	program->setUniformValue("projection", projectionMatrix);
 }
 
 
 void PianoGLWin::resizeGL(int w, int h)
 {
 	// 重置键盘大小和投影矩阵
-	initPiano(w, h);
 	QMatrix4x4 projectionMatrix;
 	projectionMatrix.ortho(0.0f, static_cast<float>(w), static_cast<float>(h), 0.0f, -1.0f, 1.0f);
 	program->setUniformValue("projection", projectionMatrix);
@@ -76,7 +75,7 @@ void PianoGLWin::paintGL()
 	program->release();
 }
 
-void PianoGLWin::initPiano(int w, int h)
+void PianoGLWin::setPiano(int w, int h, bool init)
 {
 	// 计算钢琴键盘的宽高
 	WKWidth = w / 52.;
@@ -153,7 +152,7 @@ void PianoGLWin::initPiano(int w, int h)
 
 void PianoGLWin::updatePressedKeys(std::vector<Key*>& pressedKeys)
 {
-	// 更新vbo_pressedWkeys
+	// 更新被按下的键
 }
 
 
@@ -174,14 +173,8 @@ void PianoGLWin::drawKeyRange(QOpenGLBuffer* vbo, int start, int count, QVector4
 	vbo->bind();
 	program->enableAttributeArray(0);
 	program->setAttributeBuffer(0, GL_FLOAT, 0, 2, 0);
-	if (inLoop) {
-		for (int i = 0; i < count; i += 4) {
-			glDrawArrays(GL_TRIANGLE_STRIP, start + i, 4);
-		}
-	}
-	else {
-		glDrawArrays(GL_TRIANGLE_STRIP, start, count);
-	}
+	if (inLoop)  for (int i = 0; i < count; i += 4)	glDrawArrays(GL_TRIANGLE_STRIP, start + i, 4);
+	else glDrawArrays(GL_TRIANGLE_STRIP, start, count);
 	vbo->release();
 }
 
@@ -223,20 +216,31 @@ void PianoGLWin::paintPiano()
 
 Key* PianoGLWin::findKey(int x, int y)
 {
-	Key* newHoveredKey = nullptr;
+	// 对坐标进行缩放
+	x = x * PIANO_ORG_WIDTH / width();
+	y = y * PIANO_ORG_HEIGHT / height();
+	Key* onKey = nullptr;
 	for (int i = 0; i < 88; i++) { // 先找黑键
 		if (!keys[i].isWhite && x >= keys[i].paintPosX && x <= keys[i].paintPosX + BKWidth && y >= 0 && y <= BKHeight) {
-			newHoveredKey = &keys[i];
+			onKey = &keys[i];
 		}
 	}
-	if (newHoveredKey == nullptr) {
+	if (onKey == nullptr) { // 没有找到黑键
 		for (int i = 0; i < 88; i++) { // 再找白键
 			if (keys[i].isWhite && x >= keys[i].paintPosX && x <= keys[i].paintPosX + WKWidth && y >= 0 && y <= WKHeight) {
-				newHoveredKey = &keys[i];
+				onKey = &keys[i];
 			}
 		}
 	}
-	return newHoveredKey;
+	return onKey;
+}
+
+void PianoGLWin::leaveEvent(QEvent* event)
+{
+	hoveredKey = nullptr;
+	mousePressedKey = nullptr;
+	// 更新画面
+	update();
 }
 
 void PianoGLWin::mouseMoveEvent(QMouseEvent* event)
@@ -247,6 +251,17 @@ void PianoGLWin::mouseMoveEvent(QMouseEvent* event)
 	Key* tmp_key = findKey(posX, posY);
 	// 鼠标左键按下，更新被按下的键
 	if (event->buttons() == Qt::MouseButton::LeftButton) {
+		if (mousePressedKey != tmp_key) {
+			if (mousePressedKey != nullptr) {
+				remove_pressedKey(mousePressedKey);
+			}
+			// 更新被按下的键
+			if (tmp_key != nullptr) {
+				add_pressedKey(tmp_key);
+				tmp_key->play();
+			}
+			
+		}
 		mousePressedKey = tmp_key;
 		hoveredKey = nullptr;
 	}
@@ -267,9 +282,12 @@ void PianoGLWin::mousePressEvent(QMouseEvent* event)
 	// 左键按下，更新被按下的键
 	if (event->buttons() == Qt::MouseButton::LeftButton) {
 		if (hoveredKey != nullptr) {
+			// 切换
 			mousePressedKey = hoveredKey;
 			hoveredKey = nullptr;
 			mousePressedKey->play();
+			// 更新被按下的键
+			add_pressedKey(mousePressedKey);
 		}
 	}
 	// 更新画面
@@ -284,6 +302,9 @@ void PianoGLWin::mouseReleaseEvent(QMouseEvent* event)
 	// 左键释放，更新被按下的键
 	if (event->button() == Qt::MouseButton::LeftButton) {
 		if (mousePressedKey != nullptr) {
+			// 更新被按下的键
+			remove_pressedKey(mousePressedKey);
+			// 切换
 			mousePressedKey->stop();
 			hoveredKey = mousePressedKey;
 			mousePressedKey = nullptr;
@@ -293,9 +314,43 @@ void PianoGLWin::mouseReleaseEvent(QMouseEvent* event)
 	update();
 }
 
+void PianoGLWin::add_pressedKey(Key* pressedKey)
+{
+	if (pressedKey == nullptr) {
+		throw std::runtime_error("PianoGLWin::add_pressedKey() : Empty pressedKey");
+	}
+	if (pressedKey->isWhite) {
+		pressedWkeys.push_back(pressedKey);
+	}
+	else {
+		pressedBkeys.push_back(pressedKey);
+	}
+	emit updatePressedKeysMessage();
+}
+
+
+void PianoGLWin::remove_pressedKey(Key* pressedKey)
+{
+	if (pressedKey == nullptr) {
+		throw std::runtime_error("PianoGLWin::remove_pressedKey() : Empty pressedKey");
+	}
+	if (pressedKey->isWhite) {
+		pressedWkeys.erase(std::remove(pressedWkeys.begin(), pressedWkeys.end(), pressedKey), pressedWkeys.end());
+	}
+	else {
+		pressedBkeys.erase(std::remove(pressedBkeys.begin(), pressedBkeys.end(), pressedKey), pressedBkeys.end());
+	}
+	emit updatePressedKeysMessage();
+}
+
+
 void PianoGLWin::add_pressedKeys(std::vector<Key*>& pressedKeys)
 {
+	if (pressedKeys.size() == 0) {
+		throw std::runtime_error("PianoGLWin::add_pressedKeys() : Empty pressedKeys");
+	}
 	for (int i = 0; i < pressedKeys.size(); i++) {
+		std::cout << pressedKeys[i]->note.name << std::endl;
 		if (pressedKeys[i]->isWhite) {
 			pressedWkeys.push_back(pressedKeys[i]);
 		}
@@ -303,7 +358,7 @@ void PianoGLWin::add_pressedKeys(std::vector<Key*>& pressedKeys)
 			pressedBkeys.push_back(pressedKeys[i]);
 		}
 	}
-	// 更新主界面的按键内容显示Label
+	emit updatePressedKeysMessage();
 }
 
 void PianoGLWin::remove_pressedKeys(std::vector<Key*>& pressedKeys)
@@ -316,6 +371,5 @@ void PianoGLWin::remove_pressedKeys(std::vector<Key*>& pressedKeys)
 			pressedBkeys.erase(std::remove(pressedBkeys.begin(), pressedBkeys.end(), pressedKeys[i]), pressedBkeys.end());
 		}
 	}
-	// 更新主界面的按键内容显示Label
+	emit updatePressedKeysMessage();
 }
-

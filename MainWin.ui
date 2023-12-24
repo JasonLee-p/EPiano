@@ -7,13 +7,19 @@
     <x>0</x>
     <y>0</y>
     <width>1400</width>
-    <height>331</height>
+    <height>386</height>
    </rect>
+  </property>
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
   </property>
   <property name="minimumSize">
    <size>
     <width>1000</width>
-    <height>300</height>
+    <height>250</height>
    </size>
   </property>
   <property name="baseSize">
@@ -26,14 +32,20 @@
    <bool>true</bool>
   </property>
   <property name="focusPolicy">
-   <enum>Qt::ClickFocus</enum>
+   <enum>Qt::StrongFocus</enum>
+  </property>
+  <property name="contextMenuPolicy">
+   <enum>Qt::CustomContextMenu</enum>
   </property>
   <property name="windowTitle">
    <string>EPiano</string>
   </property>
   <property name="windowIcon">
-   <iconset resource="MainWin.qrc">
-    <normaloff>:/MainWin/data/piano.ico</normaloff>:/MainWin/data/piano.ico</iconset>
+   <iconset>
+    <normaloff>data/piano.ico</normaloff>data/piano.ico</iconset>
+  </property>
+  <property name="windowOpacity">
+   <double>1.000000000000000</double>
   </property>
   <property name="whatsThis">
    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;这是一款简易的钢琴模拟器&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
@@ -42,10 +54,18 @@
    <bool>false</bool>
   </property>
   <property name="styleSheet">
-   <string notr="true">background-color: rgb(255, 246, 243);
-color: rgb(0, 4, 39);</string>
+   <string notr="true"/>
+  </property>
+  <property name="tabShape">
+   <enum>QTabWidget::Rounded</enum>
   </property>
   <widget class="QWidget" name="centralWidget">
+   <property name="mouseTracking">
+    <bool>true</bool>
+   </property>
+   <property name="focusPolicy">
+    <enum>Qt::StrongFocus</enum>
+   </property>
    <layout class="QVBoxLayout" name="verticalLayout_2">
     <property name="spacing">
      <number>0</number>
@@ -64,87 +84,67 @@ color: rgb(0, 4, 39);</string>
     </property>
     <item>
      <widget class="QWidget" name="widget" native="true">
+      <property name="styleSheet">
+       <string notr="true">background-color: rgb(255, 246, 243);
+color: rgb(0, 4, 39);</string>
+      </property>
       <layout class="QHBoxLayout" name="horizontalLayout_2">
        <property name="spacing">
-        <number>15</number>
+        <number>0</number>
        </property>
        <property name="leftMargin">
-        <number>30</number>
+        <number>45</number>
        </property>
        <property name="topMargin">
-        <number>15</number>
+        <number>10</number>
        </property>
        <property name="rightMargin">
-        <number>30</number>
+        <number>45</number>
        </property>
        <property name="bottomMargin">
-        <number>15</number>
+        <number>0</number>
        </property>
        <item>
         <widget class="QWidget" name="leftWidget" native="true">
          <property name="sizePolicy">
-          <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+          <sizepolicy hsizetype="MinimumExpanding" vsizetype="Preferred">
            <horstretch>0</horstretch>
            <verstretch>0</verstretch>
           </sizepolicy>
          </property>
          <property name="minimumSize">
           <size>
-           <width>300</width>
+           <width>700</width>
            <height>0</height>
           </size>
          </property>
          <layout class="QHBoxLayout" name="horizontalLayout">
           <property name="spacing">
-           <number>15</number>
+           <number>10</number>
           </property>
           <property name="leftMargin">
-           <number>15</number>
+           <number>30</number>
           </property>
           <property name="topMargin">
-           <number>15</number>
+           <number>0</number>
           </property>
           <property name="rightMargin">
-           <number>15</number>
+           <number>30</number>
           </property>
           <property name="bottomMargin">
-           <number>15</number>
+           <number>0</number>
           </property>
           <item>
-           <widget class="QLabel" name="label">
+           <widget class="QWidget" name="noteResult" native="true">
             <property name="sizePolicy">
-             <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
+             <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
               <horstretch>0</horstretch>
               <verstretch>0</verstretch>
              </sizepolicy>
             </property>
             <property name="minimumSize">
              <size>
-              <width>0</width>
-              <height>0</height>
-             </size>
-            </property>
-            <property name="font">
-             <font>
-              <pointsize>14</pointsize>
-             </font>
-            </property>
-            <property name="text">
-             <string>当前音符：</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QFrame" name="frame">
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-              <horstretch>0</horstretch>
-              <verstretch>0</verstretch>
-             </sizepolicy>
-            </property>
-            <property name="minimumSize">
-             <size>
-              <width>100</width>
+              <width>165</width>
               <height>0</height>
              </size>
             </property>
@@ -156,53 +156,182 @@ color: rgb(0, 4, 39);</string>
             </property>
             <property name="baseSize">
              <size>
-              <width>100</width>
+              <width>150</width>
               <height>0</height>
              </size>
             </property>
             <property name="focusPolicy">
              <enum>Qt::NoFocus</enum>
             </property>
+            <property name="toolTip">
+             <string>当前演奏内容</string>
+            </property>
             <property name="styleSheet">
              <string notr="true">background-color: rgb(255, 255, 255);
-border-radius: 10px;
+border-radius: 15px;
 
 </string>
             </property>
-            <property name="frameShape">
-             <enum>QFrame::StyledPanel</enum>
-            </property>
-            <property name="frameShadow">
-             <enum>QFrame::Raised</enum>
-            </property>
             <layout class="QVBoxLayout" name="verticalLayout">
              <property name="spacing">
-              <number>4</number>
+              <number>3</number>
              </property>
              <property name="leftMargin">
               <number>22</number>
              </property>
              <property name="topMargin">
-              <number>16</number>
+              <number>10</number>
              </property>
              <property name="rightMargin">
               <number>22</number>
              </property>
              <property name="bottomMargin">
-              <number>14</number>
+              <number>12</number>
              </property>
              <item>
-              <widget class="QFrame" name="frame_2">
-               <property name="frameShape">
-                <enum>QFrame::StyledPanel</enum>
+              <widget class="QLabel" name="currentNotes">
+               <property name="font">
+                <font>
+                 <pointsize>22</pointsize>
+                </font>
                </property>
-               <property name="frameShadow">
-                <enum>QFrame::Raised</enum>
+               <property name="toolTip">
+                <string>当前演奏内容</string>
                </property>
-               <layout class="QHBoxLayout" name="horizontalLayout_3">
-                <property name="spacing">
-                 <number>0</number>
-                </property>
+               <property name="text">
+                <string>None</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QLabel" name="currentType">
+               <property name="toolTip">
+                <string>当前演奏类型</string>
+               </property>
+               <property name="text">
+                <string>None</string>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </widget>
+          </item>
+          <item>
+           <widget class="QWidget" name="widget" native="true">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="minimumSize">
+             <size>
+              <width>30</width>
+              <height>0</height>
+             </size>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QWidget" name="vAdjust" native="true">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="MinimumExpanding" vsizetype="Preferred">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>0</height>
+             </size>
+            </property>
+            <property name="baseSize">
+             <size>
+              <width>0</width>
+              <height>0</height>
+             </size>
+            </property>
+            <property name="layoutDirection">
+             <enum>Qt::LeftToRight</enum>
+            </property>
+            <property name="styleSheet">
+             <string notr="true">QWidget {
+	background-color: rgb(255, 255, 255);
+	border-top-left-radius: 35px;
+	border-top-right-radius: 35px;
+}
+QSlider {
+	border-radius: 4px;
+	height: 20px;
+	margin: 0px 0px 0px 0px;
+	border: 0px;
+}
+QSlider::handle:horizontal {
+	border-radius: 4px;
+	background-color: rgb(255, 177, 177);
+}
+QSlider::handle:horizontal:hover {
+	border-radius: 4px;
+	background-color: rgb(255, 111, 111);
+}
+QSlider::handle:horizontal:pressed {
+	border-radius: 4px;
+	background-color: rgb(255, 111, 111);
+}
+QSlider::add-line:horizontal {
+	width: 0px;
+	subcontrol-position: right;
+	subcontrol-origin: margin;
+}
+QSlider::add-page:horizontal, QScrollBar::sub-page:horizontal {
+	background: none;
+}
+QSlider {
+	border-radius: 4px;
+	width: 20px;
+	margin: 0px 0px 0px 0px;
+}
+QSlider::handle:vertical {
+	border-radius: 4px;
+	background-color: rgb(255, 177, 177);
+}
+QSlider::handle:vertical:hover {
+	border-radius: 4px;
+	background-color: rgb(255, 111, 111);
+}
+QSlider::handle:vertical:pressed {
+	border-radius: 4px;
+	background-color: rgb(255, 111, 111);
+}
+QSlider::add-line:vertical {
+	width: 0px;
+	subcontrol-position: right;
+	subcontrol-origin: margin;
+}
+QSlider::add-page:vertical, QScrollBar::sub-page:vertical {
+	background: none;
+}</string>
+            </property>
+            <layout class="QGridLayout" name="gridLayout">
+             <property name="leftMargin">
+              <number>30</number>
+             </property>
+             <property name="topMargin">
+              <number>25</number>
+             </property>
+             <property name="rightMargin">
+              <number>30</number>
+             </property>
+             <property name="bottomMargin">
+              <number>10</number>
+             </property>
+             <property name="spacing">
+              <number>6</number>
+             </property>
+             <item row="1" column="0" colspan="2">
+              <widget class="QWidget" name="horizontalWidget" native="true">
+               <layout class="QGridLayout" name="gridLayout_2">
                 <property name="leftMargin">
                  <number>0</number>
                 </property>
@@ -215,25 +344,841 @@ border-radius: 10px;
                 <property name="bottomMargin">
                  <number>0</number>
                 </property>
-                <item>
-                 <widget class="QLabel" name="currentNotes">
-                  <property name="font">
-                   <font>
-                    <pointsize>22</pointsize>
-                   </font>
+                <property name="horizontalSpacing">
+                 <number>1</number>
+                </property>
+                <property name="verticalSpacing">
+                 <number>5</number>
+                </property>
+                <item row="1" column="17">
+                 <widget class="Slider" name="slider13">
+                  <property name="toolTip">
+                   <string>谐波强度</string>
+                  </property>
+                  <property name="maximum">
+                   <number>127</number>
+                  </property>
+                  <property name="pageStep">
+                   <number>0</number>
+                  </property>
+                  <property name="value">
+                   <number>5</number>
+                  </property>
+                  <property name="tracking">
+                   <bool>false</bool>
+                  </property>
+                  <property name="orientation">
+                   <enum>Qt::Vertical</enum>
+                  </property>
+                  <property name="tickPosition">
+                   <enum>QSlider::NoTicks</enum>
+                  </property>
+                  <property name="tickInterval">
+                   <number>16</number>
+                  </property>
+                 </widget>
+                </item>
+                <item row="0" column="16">
+                 <widget class="QLabel" name="label12">
+                  <property name="toolTip">
+                   <string>谐波强度</string>
                   </property>
                   <property name="text">
-                   <string>None</string>
+                   <string>12</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="0" column="7">
+                 <widget class="QLabel" name="label3">
+                  <property name="toolTip">
+                   <string>谐波强度</string>
+                  </property>
+                  <property name="layoutDirection">
+                   <enum>Qt::LeftToRight</enum>
+                  </property>
+                  <property name="text">
+                   <string>3</string>
+                  </property>
+                  <property name="textFormat">
+                   <enum>Qt::AutoText</enum>
+                  </property>
+                  <property name="alignment">
+                   <set>Qt::AlignCenter</set>
+                  </property>
+                 </widget>
+                </item>
+                <item row="1" column="10">
+                 <widget class="Slider" name="slider6">
+                  <property name="toolTip">
+                   <string>谐波强度</string>
+                  </property>
+                  <property name="maximum">
+                   <number>127</number>
+                  </property>
+                  <property name="pageStep">
+                   <number>0</number>
+                  </property>
+                  <property name="value">
+                   <number>60</number>
+                  </property>
+                  <property name="tracking">
+                   <bool>false</bool>
+                  </property>
+                  <property name="orientation">
+                   <enum>Qt::Vertical</enum>
+                  </property>
+                  <property name="tickPosition">
+                   <enum>QSlider::NoTicks</enum>
+                  </property>
+                  <property name="tickInterval">
+                   <number>16</number>
+                  </property>
+                 </widget>
+                </item>
+                <item row="1" column="12">
+                 <widget class="Slider" name="slider8">
+                  <property name="toolTip">
+                   <string>谐波强度</string>
+                  </property>
+                  <property name="maximum">
+                   <number>127</number>
+                  </property>
+                  <property name="pageStep">
+                   <number>0</number>
+                  </property>
+                  <property name="value">
+                   <number>44</number>
+                  </property>
+                  <property name="tracking">
+                   <bool>false</bool>
+                  </property>
+                  <property name="orientation">
+                   <enum>Qt::Vertical</enum>
+                  </property>
+                  <property name="tickPosition">
+                   <enum>QSlider::NoTicks</enum>
+                  </property>
+                  <property name="tickInterval">
+                   <number>16</number>
+                  </property>
+                 </widget>
+                </item>
+                <item row="0" column="13">
+                 <widget class="QLabel" name="label9">
+                  <property name="toolTip">
+                   <string>谐波强度</string>
+                  </property>
+                  <property name="layoutDirection">
+                   <enum>Qt::LeftToRight</enum>
+                  </property>
+                  <property name="text">
+                   <string>9</string>
+                  </property>
+                  <property name="textFormat">
+                   <enum>Qt::AutoText</enum>
+                  </property>
+                  <property name="alignment">
+                   <set>Qt::AlignCenter</set>
+                  </property>
+                 </widget>
+                </item>
+                <item row="0" column="12">
+                 <widget class="QLabel" name="label8">
+                  <property name="toolTip">
+                   <string>谐波强度</string>
+                  </property>
+                  <property name="layoutDirection">
+                   <enum>Qt::LeftToRight</enum>
+                  </property>
+                  <property name="text">
+                   <string>8</string>
+                  </property>
+                  <property name="textFormat">
+                   <enum>Qt::AutoText</enum>
+                  </property>
+                  <property name="alignment">
+                   <set>Qt::AlignCenter</set>
+                  </property>
+                 </widget>
+                </item>
+                <item row="0" column="11">
+                 <widget class="QLabel" name="label7">
+                  <property name="toolTip">
+                   <string>谐波强度</string>
+                  </property>
+                  <property name="layoutDirection">
+                   <enum>Qt::LeftToRight</enum>
+                  </property>
+                  <property name="text">
+                   <string>7</string>
+                  </property>
+                  <property name="textFormat">
+                   <enum>Qt::AutoText</enum>
+                  </property>
+                  <property name="alignment">
+                   <set>Qt::AlignCenter</set>
+                  </property>
+                 </widget>
+                </item>
+                <item row="1" column="5">
+                 <widget class="Slider" name="sliderBase">
+                  <property name="toolTip">
+                   <string>谐波强度</string>
+                  </property>
+                  <property name="maximum">
+                   <number>127</number>
+                  </property>
+                  <property name="pageStep">
+                   <number>0</number>
+                  </property>
+                  <property name="value">
+                   <number>120</number>
+                  </property>
+                  <property name="tracking">
+                   <bool>false</bool>
+                  </property>
+                  <property name="orientation">
+                   <enum>Qt::Vertical</enum>
+                  </property>
+                  <property name="tickPosition">
+                   <enum>QSlider::NoTicks</enum>
+                  </property>
+                  <property name="tickInterval">
+                   <number>16</number>
+                  </property>
+                 </widget>
+                </item>
+                <item row="0" column="9">
+                 <widget class="QLabel" name="label4_2">
+                  <property name="toolTip">
+                   <string>谐波强度</string>
+                  </property>
+                  <property name="layoutDirection">
+                   <enum>Qt::LeftToRight</enum>
+                  </property>
+                  <property name="text">
+                   <string>5</string>
+                  </property>
+                  <property name="textFormat">
+                   <enum>Qt::AutoText</enum>
+                  </property>
+                  <property name="alignment">
+                   <set>Qt::AlignCenter</set>
+                  </property>
+                 </widget>
+                </item>
+                <item row="1" column="0">
+                 <widget class="Slider" name="sliderA">
+                  <property name="toolTip">
+                   <string>起音（Attack）</string>
+                  </property>
+                  <property name="styleSheet">
+                   <string notr="true"/>
+                  </property>
+                  <property name="maximum">
+                   <number>127</number>
+                  </property>
+                  <property name="pageStep">
+                   <number>0</number>
+                  </property>
+                  <property name="value">
+                   <number>8</number>
+                  </property>
+                  <property name="tracking">
+                   <bool>false</bool>
+                  </property>
+                  <property name="orientation">
+                   <enum>Qt::Vertical</enum>
+                  </property>
+                  <property name="tickPosition">
+                   <enum>QSlider::NoTicks</enum>
+                  </property>
+                  <property name="tickInterval">
+                   <number>16</number>
+                  </property>
+                 </widget>
+                </item>
+                <item row="0" column="3">
+                 <widget class="QLabel" name="labelR">
+                  <property name="toolTip">
+                   <string>释音（Release）</string>
+                  </property>
+                  <property name="layoutDirection">
+                   <enum>Qt::LeftToRight</enum>
+                  </property>
+                  <property name="text">
+                   <string>R</string>
+                  </property>
+                  <property name="alignment">
+                   <set>Qt::AlignCenter</set>
+                  </property>
+                 </widget>
+                </item>
+                <item row="0" column="17">
+                 <widget class="QLabel" name="label13">
+                  <property name="toolTip">
+                   <string>谐波强度</string>
+                  </property>
+                  <property name="text">
+                   <string>13</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="1" column="6">
+                 <widget class="Slider" name="slider2">
+                  <property name="toolTip">
+                   <string>谐波强度</string>
+                  </property>
+                  <property name="maximum">
+                   <number>127</number>
+                  </property>
+                  <property name="pageStep">
+                   <number>0</number>
+                  </property>
+                  <property name="value">
+                   <number>111</number>
+                  </property>
+                  <property name="tracking">
+                   <bool>false</bool>
+                  </property>
+                  <property name="orientation">
+                   <enum>Qt::Vertical</enum>
+                  </property>
+                  <property name="invertedAppearance">
+                   <bool>false</bool>
+                  </property>
+                  <property name="invertedControls">
+                   <bool>false</bool>
+                  </property>
+                  <property name="tickPosition">
+                   <enum>QSlider::NoTicks</enum>
+                  </property>
+                  <property name="tickInterval">
+                   <number>16</number>
+                  </property>
+                 </widget>
+                </item>
+                <item row="0" column="14">
+                 <widget class="QLabel" name="label10">
+                  <property name="toolTip">
+                   <string>谐波强度</string>
+                  </property>
+                  <property name="text">
+                   <string>10</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="1" column="14">
+                 <widget class="Slider" name="slider10">
+                  <property name="toolTip">
+                   <string>谐波强度</string>
+                  </property>
+                  <property name="maximum">
+                   <number>127</number>
+                  </property>
+                  <property name="pageStep">
+                   <number>0</number>
+                  </property>
+                  <property name="value">
+                   <number>20</number>
+                  </property>
+                  <property name="tracking">
+                   <bool>false</bool>
+                  </property>
+                  <property name="orientation">
+                   <enum>Qt::Vertical</enum>
+                  </property>
+                  <property name="tickPosition">
+                   <enum>QSlider::NoTicks</enum>
+                  </property>
+                  <property name="tickInterval">
+                   <number>16</number>
+                  </property>
+                 </widget>
+                </item>
+                <item row="0" column="1">
+                 <widget class="QLabel" name="labelD">
+                  <property name="toolTip">
+                   <string>衰减（Decay）</string>
+                  </property>
+                  <property name="layoutDirection">
+                   <enum>Qt::LeftToRight</enum>
+                  </property>
+                  <property name="text">
+                   <string>D</string>
+                  </property>
+                  <property name="alignment">
+                   <set>Qt::AlignCenter</set>
+                  </property>
+                 </widget>
+                </item>
+                <item row="1" column="11">
+                 <widget class="Slider" name="slider7">
+                  <property name="toolTip">
+                   <string>谐波强度</string>
+                  </property>
+                  <property name="maximum">
+                   <number>127</number>
+                  </property>
+                  <property name="pageStep">
+                   <number>0</number>
+                  </property>
+                  <property name="value">
+                   <number>50</number>
+                  </property>
+                  <property name="tracking">
+                   <bool>false</bool>
+                  </property>
+                  <property name="orientation">
+                   <enum>Qt::Vertical</enum>
+                  </property>
+                  <property name="tickPosition">
+                   <enum>QSlider::NoTicks</enum>
+                  </property>
+                  <property name="tickInterval">
+                   <number>16</number>
+                  </property>
+                 </widget>
+                </item>
+                <item row="0" column="2">
+                 <widget class="QLabel" name="labelS">
+                  <property name="toolTip">
+                   <string>延音（Sustain）</string>
+                  </property>
+                  <property name="text">
+                   <string>S</string>
+                  </property>
+                  <property name="alignment">
+                   <set>Qt::AlignCenter</set>
+                  </property>
+                 </widget>
+                </item>
+                <item row="0" column="0">
+                 <widget class="QLabel" name="labelA">
+                  <property name="toolTip">
+                   <string>起音（Attack）</string>
+                  </property>
+                  <property name="layoutDirection">
+                   <enum>Qt::LeftToRight</enum>
+                  </property>
+                  <property name="text">
+                   <string>A</string>
+                  </property>
+                  <property name="alignment">
+                   <set>Qt::AlignCenter</set>
+                  </property>
+                 </widget>
+                </item>
+                <item row="0" column="8">
+                 <widget class="QLabel" name="label4">
+                  <property name="toolTip">
+                   <string>谐波强度</string>
+                  </property>
+                  <property name="layoutDirection">
+                   <enum>Qt::LeftToRight</enum>
+                  </property>
+                  <property name="text">
+                   <string>4</string>
+                  </property>
+                  <property name="textFormat">
+                   <enum>Qt::AutoText</enum>
+                  </property>
+                  <property name="alignment">
+                   <set>Qt::AlignCenter</set>
+                  </property>
+                 </widget>
+                </item>
+                <item row="0" column="4" rowspan="2">
+                 <widget class="Line" name="line">
+                  <property name="windowModality">
+                   <enum>Qt::NonModal</enum>
+                  </property>
+                  <property name="frameShadow">
+                   <enum>QFrame::Sunken</enum>
+                  </property>
+                  <property name="orientation">
+                   <enum>Qt::Vertical</enum>
+                  </property>
+                 </widget>
+                </item>
+                <item row="0" column="5">
+                 <widget class="QLabel" name="label_7">
+                  <property name="toolTip">
+                   <string>谐波强度</string>
+                  </property>
+                  <property name="layoutDirection">
+                   <enum>Qt::LeftToRight</enum>
+                  </property>
+                  <property name="text">
+                   <string>基频</string>
+                  </property>
+                  <property name="textFormat">
+                   <enum>Qt::AutoText</enum>
+                  </property>
+                  <property name="alignment">
+                   <set>Qt::AlignCenter</set>
+                  </property>
+                 </widget>
+                </item>
+                <item row="1" column="9">
+                 <widget class="Slider" name="slider5">
+                  <property name="toolTip">
+                   <string>谐波强度</string>
+                  </property>
+                  <property name="maximum">
+                   <number>127</number>
+                  </property>
+                  <property name="pageStep">
+                   <number>0</number>
+                  </property>
+                  <property name="value">
+                   <number>66</number>
+                  </property>
+                  <property name="tracking">
+                   <bool>false</bool>
+                  </property>
+                  <property name="orientation">
+                   <enum>Qt::Vertical</enum>
+                  </property>
+                  <property name="tickPosition">
+                   <enum>QSlider::NoTicks</enum>
+                  </property>
+                  <property name="tickInterval">
+                   <number>16</number>
+                  </property>
+                 </widget>
+                </item>
+                <item row="1" column="3">
+                 <widget class="Slider" name="sliderR">
+                  <property name="toolTip">
+                   <string>释音（Release）</string>
+                  </property>
+                  <property name="maximum">
+                   <number>127</number>
+                  </property>
+                  <property name="pageStep">
+                   <number>0</number>
+                  </property>
+                  <property name="value">
+                   <number>16</number>
+                  </property>
+                  <property name="tracking">
+                   <bool>false</bool>
+                  </property>
+                  <property name="orientation">
+                   <enum>Qt::Vertical</enum>
+                  </property>
+                  <property name="tickPosition">
+                   <enum>QSlider::NoTicks</enum>
+                  </property>
+                  <property name="tickInterval">
+                   <number>16</number>
+                  </property>
+                 </widget>
+                </item>
+                <item row="1" column="8">
+                 <widget class="Slider" name="slider4">
+                  <property name="toolTip">
+                   <string>谐波强度</string>
+                  </property>
+                  <property name="maximum">
+                   <number>127</number>
+                  </property>
+                  <property name="pageStep">
+                   <number>0</number>
+                  </property>
+                  <property name="value">
+                   <number>80</number>
+                  </property>
+                  <property name="tracking">
+                   <bool>false</bool>
+                  </property>
+                  <property name="orientation">
+                   <enum>Qt::Vertical</enum>
+                  </property>
+                  <property name="tickPosition">
+                   <enum>QSlider::NoTicks</enum>
+                  </property>
+                  <property name="tickInterval">
+                   <number>16</number>
+                  </property>
+                 </widget>
+                </item>
+                <item row="1" column="15">
+                 <widget class="Slider" name="slider11">
+                  <property name="toolTip">
+                   <string>谐波强度</string>
+                  </property>
+                  <property name="maximum">
+                   <number>127</number>
+                  </property>
+                  <property name="pageStep">
+                   <number>0</number>
+                  </property>
+                  <property name="value">
+                   <number>10</number>
+                  </property>
+                  <property name="tracking">
+                   <bool>false</bool>
+                  </property>
+                  <property name="orientation">
+                   <enum>Qt::Vertical</enum>
+                  </property>
+                  <property name="tickPosition">
+                   <enum>QSlider::NoTicks</enum>
+                  </property>
+                  <property name="tickInterval">
+                   <number>16</number>
+                  </property>
+                 </widget>
+                </item>
+                <item row="0" column="15">
+                 <widget class="QLabel" name="label11">
+                  <property name="toolTip">
+                   <string>谐波强度</string>
+                  </property>
+                  <property name="text">
+                   <string>11</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="0" column="10">
+                 <widget class="QLabel" name="label6">
+                  <property name="toolTip">
+                   <string>谐波强度</string>
+                  </property>
+                  <property name="layoutDirection">
+                   <enum>Qt::LeftToRight</enum>
+                  </property>
+                  <property name="text">
+                   <string>6</string>
+                  </property>
+                  <property name="textFormat">
+                   <enum>Qt::AutoText</enum>
+                  </property>
+                  <property name="alignment">
+                   <set>Qt::AlignCenter</set>
+                  </property>
+                 </widget>
+                </item>
+                <item row="0" column="6">
+                 <widget class="QLabel" name="label2">
+                  <property name="toolTip">
+                   <string>谐波强度</string>
+                  </property>
+                  <property name="layoutDirection">
+                   <enum>Qt::LeftToRight</enum>
+                  </property>
+                  <property name="text">
+                   <string>2</string>
+                  </property>
+                  <property name="textFormat">
+                   <enum>Qt::AutoText</enum>
+                  </property>
+                  <property name="alignment">
+                   <set>Qt::AlignCenter</set>
+                  </property>
+                 </widget>
+                </item>
+                <item row="1" column="16">
+                 <widget class="Slider" name="slider12">
+                  <property name="toolTip">
+                   <string>谐波强度</string>
+                  </property>
+                  <property name="maximum">
+                   <number>127</number>
+                  </property>
+                  <property name="pageStep">
+                   <number>0</number>
+                  </property>
+                  <property name="value">
+                   <number>5</number>
+                  </property>
+                  <property name="tracking">
+                   <bool>false</bool>
+                  </property>
+                  <property name="orientation">
+                   <enum>Qt::Vertical</enum>
+                  </property>
+                  <property name="tickPosition">
+                   <enum>QSlider::NoTicks</enum>
+                  </property>
+                  <property name="tickInterval">
+                   <number>16</number>
+                  </property>
+                 </widget>
+                </item>
+                <item row="1" column="2">
+                 <widget class="Slider" name="sliderS">
+                  <property name="toolTip">
+                   <string>延音（Sustain）</string>
+                  </property>
+                  <property name="maximum">
+                   <number>127</number>
+                  </property>
+                  <property name="pageStep">
+                   <number>0</number>
+                  </property>
+                  <property name="value">
+                   <number>96</number>
+                  </property>
+                  <property name="sliderPosition">
+                   <number>96</number>
+                  </property>
+                  <property name="tracking">
+                   <bool>false</bool>
+                  </property>
+                  <property name="orientation">
+                   <enum>Qt::Vertical</enum>
+                  </property>
+                  <property name="tickPosition">
+                   <enum>QSlider::NoTicks</enum>
+                  </property>
+                  <property name="tickInterval">
+                   <number>16</number>
+                  </property>
+                 </widget>
+                </item>
+                <item row="1" column="1">
+                 <widget class="Slider" name="sliderD">
+                  <property name="toolTip">
+                   <string>衰减（Decay）</string>
+                  </property>
+                  <property name="maximum">
+                   <number>127</number>
+                  </property>
+                  <property name="pageStep">
+                   <number>0</number>
+                  </property>
+                  <property name="value">
+                   <number>32</number>
+                  </property>
+                  <property name="tracking">
+                   <bool>false</bool>
+                  </property>
+                  <property name="orientation">
+                   <enum>Qt::Vertical</enum>
+                  </property>
+                  <property name="tickPosition">
+                   <enum>QSlider::NoTicks</enum>
+                  </property>
+                  <property name="tickInterval">
+                   <number>16</number>
+                  </property>
+                 </widget>
+                </item>
+                <item row="1" column="13">
+                 <widget class="Slider" name="slider9">
+                  <property name="toolTip">
+                   <string>谐波强度</string>
+                  </property>
+                  <property name="maximum">
+                   <number>127</number>
+                  </property>
+                  <property name="pageStep">
+                   <number>0</number>
+                  </property>
+                  <property name="value">
+                   <number>33</number>
+                  </property>
+                  <property name="tracking">
+                   <bool>false</bool>
+                  </property>
+                  <property name="orientation">
+                   <enum>Qt::Vertical</enum>
+                  </property>
+                  <property name="tickPosition">
+                   <enum>QSlider::NoTicks</enum>
+                  </property>
+                  <property name="tickInterval">
+                   <number>16</number>
+                  </property>
+                 </widget>
+                </item>
+                <item row="1" column="7">
+                 <widget class="Slider" name="slider3">
+                  <property name="toolTip">
+                   <string>谐波强度</string>
+                  </property>
+                  <property name="maximum">
+                   <number>127</number>
+                  </property>
+                  <property name="pageStep">
+                   <number>0</number>
+                  </property>
+                  <property name="value">
+                   <number>90</number>
+                  </property>
+                  <property name="tracking">
+                   <bool>false</bool>
+                  </property>
+                  <property name="orientation">
+                   <enum>Qt::Vertical</enum>
+                  </property>
+                  <property name="tickPosition">
+                   <enum>QSlider::NoTicks</enum>
+                  </property>
+                  <property name="tickInterval">
+                   <number>16</number>
                   </property>
                  </widget>
                 </item>
                </layout>
               </widget>
              </item>
-             <item>
-              <widget class="QLabel" name="currentType">
+             <item row="0" column="1">
+              <widget class="Slider" name="horizontalSlider">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+               <property name="toolTip">
+                <string>使用鼠标或键盘时的音符力度</string>
+               </property>
+               <property name="styleSheet">
+                <string notr="true"/>
+               </property>
+               <property name="maximum">
+                <number>127</number>
+               </property>
+               <property name="pageStep">
+                <number>0</number>
+               </property>
+               <property name="value">
+                <number>64</number>
+               </property>
+               <property name="tracking">
+                <bool>false</bool>
+               </property>
+               <property name="orientation">
+                <enum>Qt::Horizontal</enum>
+               </property>
+               <property name="invertedAppearance">
+                <bool>false</bool>
+               </property>
+               <property name="invertedControls">
+                <bool>false</bool>
+               </property>
+               <property name="tickPosition">
+                <enum>QSlider::NoTicks</enum>
+               </property>
+               <property name="tickInterval">
+                <number>8</number>
+               </property>
+              </widget>
+             </item>
+             <item row="0" column="0">
+              <widget class="QLabel" name="label_3">
+               <property name="toolTip">
+                <string>使用鼠标或键盘时的音符力度</string>
+               </property>
                <property name="text">
-                <string>None</string>
+                <string>力度</string>
+               </property>
+               <property name="alignment">
+                <set>Qt::AlignCenter</set>
                </property>
               </widget>
              </item>
@@ -244,7 +1189,53 @@ border-radius: 10px;
         </widget>
        </item>
        <item>
-        <widget class="QWidget" name="rightWidget" native="true"/>
+        <widget class="QWidget" name="rightWidget" native="true">
+         <layout class="QHBoxLayout" name="horizontalLayout_4">
+          <property name="leftMargin">
+           <number>0</number>
+          </property>
+          <property name="topMargin">
+           <number>25</number>
+          </property>
+          <property name="rightMargin">
+           <number>0</number>
+          </property>
+          <property name="bottomMargin">
+           <number>0</number>
+          </property>
+          <item>
+           <widget class="QLabel" name="label_2">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="layoutDirection">
+             <enum>Qt::LeftToRight</enum>
+            </property>
+            <property name="styleSheet">
+             <string notr="true">background-color: rgba(255, 255, 255, 0);</string>
+            </property>
+            <property name="frameShape">
+             <enum>QFrame::NoFrame</enum>
+            </property>
+            <property name="text">
+             <string/>
+            </property>
+            <property name="pixmap">
+             <pixmap resource="MainWin.qrc">:/MainWin/data/pianoLarger.png</pixmap>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignRight|Qt::AlignTop|Qt::AlignTrailing</set>
+            </property>
+            <property name="wordWrap">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
        </item>
       </layout>
      </widget>
@@ -279,10 +1270,17 @@ border-radius: 10px;
      <height>22</height>
     </rect>
    </property>
-   <property name="styleSheet">
-    <string notr="true"/>
+   <property name="focusPolicy">
+    <enum>Qt::StrongFocus</enum>
    </property>
-   <widget class="QMenu" name="settingMenu">
+   <property name="styleSheet">
+    <string notr="true">background-color: rgb(255, 246, 243);
+color: rgb(0, 4, 39);</string>
+   </property>
+   <widget class="Menu" name="settingMenu">
+    <property name="focusPolicy">
+     <enum>Qt::StrongFocus</enum>
+    </property>
     <property name="styleSheet">
      <string notr="true">background-color: rgb(255, 240, 240);</string>
     </property>
@@ -290,20 +1288,31 @@ border-radius: 10px;
      <string>设置</string>
     </property>
     <addaction name="oiSetting"/>
-    <addaction name="themeSetting"/>
+    <addaction name="keysAction"/>
+    <addaction name="otherSetting"/>
    </widget>
-   <widget class="QMenu" name="aboutMenu">
+   <widget class="Menu" name="aboutMenu">
+    <property name="focusPolicy">
+     <enum>Qt::StrongFocus</enum>
+    </property>
     <property name="styleSheet">
      <string notr="true">background-color: rgb(255, 240, 240);</string>
     </property>
     <property name="title">
      <string>关于</string>
     </property>
+    <addaction name="aboutAuthor"/>
+    <addaction name="aboutQt"/>
    </widget>
    <addaction name="settingMenu"/>
    <addaction name="aboutMenu"/>
   </widget>
-  <widget class="QStatusBar" name="statusBar"/>
+  <widget class="QStatusBar" name="statusBar">
+   <property name="styleSheet">
+    <string notr="true">background-color: rgb(255, 246, 243);
+color: rgb(0, 4, 39);</string>
+   </property>
+  </widget>
   <action name="oiSetting">
    <property name="text">
     <string>输入 / 输出</string>
@@ -314,16 +1323,58 @@ border-radius: 10px;
    <property name="shortcut">
     <string>Ctrl+O</string>
    </property>
+   <property name="priority">
+    <enum>QAction::HighPriority</enum>
+   </property>
   </action>
-  <action name="themeSetting">
+  <action name="otherSetting">
    <property name="text">
-    <string>主题</string>
+    <string>其他</string>
    </property>
    <property name="toolTip">
     <string>主题 设置</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+T</string>
+   </property>
+  </action>
+  <action name="aboutAuthor">
+   <property name="text">
+    <string>作者</string>
+   </property>
+   <property name="toolTip">
+    <string>关于 作者</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+A</string>
+   </property>
+   <property name="priority">
+    <enum>QAction::HighPriority</enum>
+   </property>
+  </action>
+  <action name="aboutQt">
+   <property name="text">
+    <string>Qt</string>
+   </property>
+   <property name="toolTip">
+    <string>关于 Qt</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Q</string>
+   </property>
+   <property name="menuRole">
+    <enum>QAction::AboutQtRole</enum>
+   </property>
+  </action>
+  <action name="keysAction">
+   <property name="text">
+    <string>键位 </string>
+   </property>
+   <property name="toolTip">
+    <string>键位 设置</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+P</string>
    </property>
   </action>
  </widget>
@@ -333,6 +1384,22 @@ border-radius: 10px;
    <class>PianoGLWin</class>
    <extends>QOpenGLWidget</extends>
    <header>PianoGLWin.h</header>
+   <slots>
+    <signal>updatePressedKeysMessage()</signal>
+   </slots>
+  </customwidget>
+  <customwidget>
+   <class>Menu</class>
+   <extends>QMenu</extends>
+   <header>MyWidgets.h</header>
+   <slots>
+    <signal>aboutToShowWithMouse(QPoint)</signal>
+   </slots>
+  </customwidget>
+  <customwidget>
+   <class>Slider</class>
+   <extends>QSlider</extends>
+   <header>MyWidgets.h</header>
   </customwidget>
  </customwidgets>
  <resources>

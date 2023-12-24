@@ -4,12 +4,12 @@
 MidiDeviceHandler::MidiDeviceHandler() {
     initMidiPlayer();
     getMidiDevices();
-    getAudioDevices();
+
 }
 
 MidiDeviceHandler::~MidiDeviceHandler() {
-    closeMidiPort();
-    closeAudioPort();
+    closeMidiInPort();
+    closeMidiOutPort();
 
     if (midiin) {
         delete midiin;
@@ -22,138 +22,110 @@ MidiDeviceHandler::~MidiDeviceHandler() {
 void MidiDeviceHandler::initMidiPlayer() {
     // 初始化MIDI播放器（rtmidi库）
     try {
+        midiin = new RtMidiIn();
 		midiout = new RtMidiOut();
 	}
     catch (RtMidiError& error) {
-		std::cerr << "Error initializing MIDI player: " << error.what() << std::endl;
+		std::cerr << "[ERROR] Failed to initialize MIDI player: " << error.what() << std::endl;
 	}
 }
 
 void MidiDeviceHandler::getMidiDevices() {
-    // 使用Windows API获取可用的MIDI设备信息
-    MIDIINCAPS midiInCaps;
-    UINT numDevices = midiInGetNumDevs();
-    for (UINT i = 0; i < numDevices; ++i) {
-        if (midiInGetDevCaps(i, &midiInCaps, sizeof(MIDIINCAPS)) == MMSYSERR_NOERROR) {
-            midiDevices.push_back(midiInCaps.szPname);
-            midiPorts.push_back(i);
-        }
-    }
-}
-
-void MidiDeviceHandler::getAudioDevices() {
-    // 使用Windows API获取可用的音频设备信息
-    WAVEOUTCAPS waveOutCaps;
-    UINT numDevices = waveOutGetNumDevs();
-
-    for (UINT i = 0; i < numDevices; ++i) {
-        if (waveOutGetDevCaps(i, &waveOutCaps, sizeof(WAVEOUTCAPS)) == MMSYSERR_NOERROR) {
-            audioDevices.push_back(waveOutCaps.szPname);
-            audioPorts.push_back(i);
-        }
-    }
-}
-
-void MidiDeviceHandler::openMidiPort(unsigned int port) {
-    // 打开指定端口的MIDI设备
-    closeMidiPort();  // 先关闭之前的端口
-
-    try {
-        midiin = new RtMidiIn();
-        midiin->openPort(port);
-        midiin->setCallback(&MidiDeviceHandler::midiCallback, this);
-        midiin->ignoreTypes(false, false, false);
-        midiPort = port;
-    }
-    catch (RtMidiError& error) {
-        std::cerr << "Error opening MIDI input port: " << error.what() << std::endl;
-    }
-}
-
-void MidiDeviceHandler::openAudioPort(unsigned int port) {
-    // 打开指定端口的音频设备
-    closeAudioPort();  // 先关闭之前的端口
-
-    try {
-        // 使用Windows API打开音频设备
-        std::cout << "Opening audio port: " << port << std::endl;
-        audioPort = port;
-    }
-    catch (std::exception& error) {
-        std::cerr << "Error opening audio output port: " << error.what() << std::endl;
-    }
-}
-
-
-void MidiDeviceHandler::closeMidiPort() {
-    // 关闭MIDI设备端口
-    if (midiin && midiin->isPortOpen()) {
-        midiin->closePort();
-        delete midiin;
-        midiin = nullptr;
-        midiPort = 0;
-    }
-}
-
-void MidiDeviceHandler::closeAudioPort() {
-    // 关闭音频设备端口
-    std::cout << "Closing audio port" << std::endl;
-}
-
-
-void MidiDeviceHandler::sendMessage(std::vector<unsigned char>* message) {
-    sendMessage(message, midiPort, midiout);
-}
-
-void MidiDeviceHandler::sendMessage(std::vector<unsigned char>* message, unsigned int port) {
-    sendMessage(message, port, midiout);
-}
-
-void MidiDeviceHandler::sendMessage(std::vector<unsigned char>* message, RtMidiOut* midiout) {
-    sendMessage(message, midiPort, midiout);
-}
-
-void MidiDeviceHandler::sendMessage(std::vector<unsigned char>* message, unsigned int port, RtMidiOut* midiout) {
-    // 发送MIDI消息
-    if (midiout && midiout->isPortOpen()) {
+    // 输入设备
+    unsigned int nPorts = midiin->getPortCount();
+    std::cout << "[INFO] MIDI input ports:" << std::endl;
+    std::string portName;
+    for (unsigned int i = 0; i < nPorts; i++) {
         try {
-            midiout->openPort(port);
-            midiout->sendMessage(message);
-
-            midiout->closePort();
+            portName = midiin->getPortName(i);
+            midiInDevices.push_back(portName);
+            midiInPorts.push_back(i);
         }
         catch (RtMidiError& error) {
-            std::cerr << "Error sending MIDI message: " << error.what() << std::endl;
+            error.printMessage();
         }
+        std::cout << "[INFO] -Input Port #" << i + 1 << ": " << portName << '\n';
     }
+    // 输出设备
+    nPorts = midiout->getPortCount();
+    std::cout << "[INFO] MIDI output ports:" << std::endl;
+    for (unsigned int i = 0; i < nPorts; i++) {
+        try {
+			portName = midiout->getPortName(i);
+			midiOutDevices.push_back(portName);
+			midiOutPorts.push_back(i);
+		}
+        catch (RtMidiError& error) {
+			error.printMessage();
+		}
+		std::cout << "[INFO] -Output Port #" << i + 1 << ": " << portName << '\n';
+	}
+}
+
+
+void MidiDeviceHandler::openMidiInPort(unsigned int port) {
+	// 打开指定端口的MIDI输入设备
+	closeMidiInPort();  // 先关闭之前的端口
+
+    try {
+		// 使用rtmidi库打开MIDI输入设备
+		std::cout << "[INFO] Opening MIDI input port: " << port << std::endl;
+		midiin->openPort(port);
+		midiin->setCallback(&MidiDeviceHandler::midiCallback, this);
+		midiin->ignoreTypes(false, false, false);
+		midiInPort = port;
+	}
+    catch (RtMidiError& error) {
+		std::cerr << "[ERROR] Failed to open MIDI input port: " << error.what() << std::endl;
+	}
+}
+
+void MidiDeviceHandler::openMidiOutPort(unsigned int port) {
+	// 打开指定端口的MIDI输出设备
+	closeMidiOutPort();  // 先关闭之前的端口
+
+    try {
+		// 使用rtmidi库打开MIDI输出设备
+		std::cout << "[INFO] Opening MIDI output port: " << port << std::endl;
+		midiout->openPort(port);
+		midiOutPort = port;
+	}
+    catch (RtMidiError& error) {
+		std::cerr << "[ERROR] Failed to open MIDI output port: " << error.what() << std::endl;
+	}
+}
+
+
+void MidiDeviceHandler::closeMidiInPort() {
+	// 关闭MIDI输入设备端口
+	std::cout << "[INFO] Closing MIDI input port" << std::endl;
+    if (midiin) {
+		midiin->closePort();
+	}
+}
+
+void MidiDeviceHandler::closeMidiOutPort() {
+	// 关闭MIDI输出设备端口
+	std::cout << "[INFO] Closing MIDI output port" << std::endl;
+    if (midiout) {
+		midiout->closePort();
+	}
+}
+
+void MidiDeviceHandler::sendMidiOutMessage(unsigned char status, unsigned char data1, unsigned char data2) {
+	// 向MIDI输出设备发送消息
+	std::vector<unsigned char> message;
+	message.push_back(status);
+	message.push_back(data1);
+	message.push_back(data2);
+	midiout->sendMessage(&message);
 }
 
 void MidiDeviceHandler::midiCallback(double deltatime, std::vector<unsigned char>* message, void* userData) {
     // MIDI回调函数的实现
-    std::cout << "MIDI Callback - Delta Time: " << deltatime << ", Message: ";
+    std::cout << "[INFO] MIDI message: " << std::hex;
     for (const auto& byte : *message) {
         std::cout << std::hex << static_cast<int>(byte) << " ";
     }
     std::cout << std::dec << std::endl;
 }
-
-void MidiDeviceHandler::noteOn(Note& note, int velocity) {
-	// 按下音符
-	std::vector<unsigned char> message;
-	message.push_back(0x90);
-	message.push_back(note.midiNumber);
-	message.push_back(velocity);
-	sendMessage(&message);
-    // 播放音符
-    
-}
-
-void MidiDeviceHandler::noteOff(Note& note, int velocity) {
-	// 松开音符
-	std::vector<unsigned char> message;
-	message.push_back(0x80);
-	message.push_back(note.midiNumber);
-	message.push_back(velocity);
-	sendMessage(&message);
-}
-

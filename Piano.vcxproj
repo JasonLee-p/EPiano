@@ -64,21 +64,36 @@
     <OutDir>.\debug</OutDir>
     <IntDir>.\debug</IntDir>
     <TargetName>EPiano</TargetName>
+    <IncludePath>$(IncludePath)</IncludePath>
+    <ReferencePath>$(ReferencePath)</ReferencePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
     <OutDir>.\release</OutDir>
     <IntDir>.\release</IntDir>
     <TargetName>EPiano</TargetName>
+    <IncludePath>$(IncludePath)</IncludePath>
+    <ReferencePath>$(ReferencePath)</ReferencePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <Link>
-      <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>dsound.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>D:\libsndfile\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
+    <ClCompile>
+      <AdditionalIncludeDirectories>D:\libsndfile\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>__WINDOWS_DS__;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <AdditionalIncludeDirectories>D:\libsndfile\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>__WINDOWS_DS__;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
+    <Link>
+      <AdditionalLibraryDirectories>D:\libsndfile\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>dsound.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'" Label="Configuration">
     <ClCompile>
@@ -88,7 +103,7 @@
       <Optimization>Disabled</Optimization>
     </ClCompile>
     <Link>
-      <SubSystem>Windows</SubSystem>
+      <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
   </ItemDefinitionGroup>
@@ -96,7 +111,7 @@
     <ClCompile>
       <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
-      <DebugInformationFormat>None</DebugInformationFormat>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <Optimization>MaxSpeed</Optimization>
     </ClCompile>
     <Link>
@@ -105,10 +120,11 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="chord.cpp" />
+    <ClCompile Include="initStatic.cpp" />
     <ClCompile Include="key.cpp" />
+    <ClCompile Include="loadConfig.cpp" />
     <ClCompile Include="midiDeviceHandler.cpp" />
-    <ClCompile Include="note.cpp" />
+    <ClCompile Include="NotePlayer.cpp" />
     <ClCompile Include="packages\RtMidi.cpp" />
     <ClCompile Include="PianoGLWin.cpp">
       <DynamicSource Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">input</DynamicSource>
@@ -116,26 +132,41 @@
       <DynamicSource Condition="'$(Configuration)|$(Platform)'=='Release|x64'">input</DynamicSource>
       <QtMocFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">%(Filename).moc</QtMocFileName>
     </ClCompile>
+    <ClCompile Include="RtAudio.cpp" />
+    <ClCompile Include="Stk.cpp" />
     <QtRcc Include="MainWin.qrc" />
     <QtUic Include="MainWin.ui" />
     <QtMoc Include="MainWin.h" />
     <ClCompile Include="MainWin.cpp" />
     <ClCompile Include="main.cpp" />
-    <QtUic Include="oiSetting.ui" />
+    <QtUic Include="SettingsWin.ui" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="chord.h" />
+    <ClInclude Include="loadConfig.h" />
+    <ClInclude Include="Envelope.h" />
+    <ClInclude Include="music.h" />
     <ClInclude Include="json.hpp" />
     <ClInclude Include="key.h" />
+    <ClInclude Include="RtAudio.h" />
+    <ClInclude Include="SineWave.h" />
+    <ClInclude Include="Stk.h" />
+    <QtMoc Include="keysettingbutton.h" />
     <ClInclude Include="midiDeviceHandler.h" />
-    <ClInclude Include="note.h" />
+    <QtMoc Include="MyWidgets.h" />
+    <ClInclude Include="NotePlayer.h" />
     <ClInclude Include="packages\RtMidi.h" />
+    <ClInclude Include="resource.h" />
     <QtMoc Include="PianoGLWin.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="data\ChordAttr.json" />
+    <None Include="data\config.json" />
+    <None Include="data\config0.json" />
     <None Include="shader\fragment.glsl" />
     <None Include="shader\vertex.glsl" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="Piano.rc" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="data\piano.ico" />

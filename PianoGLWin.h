@@ -1,6 +1,5 @@
-// PianoGLWin.h
-#pragma once
-#pragma execution_character_set("utf-8")
+#ifndef PIANOGLWIN_H
+#define PIANOGLWIN_H
 
 #include <QOpenGLWidget>
 #include <QOpenGLFunctions>
@@ -9,10 +8,15 @@
 #include <QOpenGLBuffer>
 #include <QVector4D>
 #include <QMatrix4x4>
+#include <QEvent>
 #include <QMouseEvent>
+#include <QKeyEvent>
 #include <QMutexLocker>
 
+#include "loadConfig.h"
 #include "Key.h"
+#include "keysettingbutton.h"
+
 
 const QVector4D BLACK =             QVector4D(0.0f, 0.0f, 0.0f, 1.0f);
 const QVector4D WHITE =             QVector4D(1.0f, 1.0f, 1.0f, 1.0f);
@@ -81,3 +85,5 @@ private:
     Key             keys[88];                                   // 按键实例
     float           WKWidth, BKWidth, WKHeight, BKHeight;       // 绘制参数
 };
+
+#endif // !PIANOGLWIN_H

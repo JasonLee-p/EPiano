@@ -2,20 +2,20 @@
 #include <Windows.h>
 #include <iostream>
 
-#include "note.h"
+#include "NotePlayer.h"
 #include "packages/RtMidi.h"
 
 
 class MidiDeviceHandler {
-	/* 用于处理midi设备，初始化midi播放器，获取midi设备信息等 */
+	/* 用于处理midi设备，获取midi信号，发送midi信号 */
 
 public:
-	std::vector<std::wstring> midiDevices;			// 所有可用的midi设备的名称
-	std::vector<std::wstring> audioDevices;			// 所有可用的声卡或音频设备的名称
-	std::vector<unsigned int> midiPorts;			// 所有可用的midi设备的端口
-	std::vector<unsigned int> audioPorts;			// 所有可用的声卡或音频设备的端口
-	unsigned int midiPort = 0;						// 当前使用的midi设备的端口
-	unsigned int audioPort = 0;						// 当前使用的声卡或音频设备的端口
+	std::vector<std::string> midiInDevices;			// 所有可用的midi输入设备的名称
+	std::vector<std::string> midiOutDevices;		// 所有可用的midi输出设备的名称
+	std::vector<unsigned int> midiInPorts;			// 所有可用的midi输入设备的端口
+	std::vector<unsigned int> midiOutPorts;			// 所有可用的midi输出设备的端口
+	unsigned int midiInPort = 0;					// 当前使用的midi输入设备的端口
+	unsigned int midiOutPort = 0;					// 当前使用的midi输出设备的端口
 
 	RtMidiIn* midiin = nullptr;						// midi输入设备
 	RtMidiOut* midiout = nullptr;					// midi输出设备
@@ -25,19 +25,14 @@ public:
 
 	void initMidiPlayer();							// 初始化midi播放器
 	void getMidiDevices();							// 获取midi设备信息
-	void getAudioDevices();							// 获取声卡或音频设备信息
-	void openMidiPort(unsigned int port);			// 打开midi设备端口
-	void openAudioPort(unsigned int port);			// 打开声卡或音频设备端口
-	void closeMidiPort();							// 关闭midi设备端口
-	void closeAudioPort();							// 关闭声卡或音频设备端口
+	void openMidiInPort(unsigned int port);			// 打开midi输入设备端口
+	void openMidiOutPort(unsigned int port);		// 打开midi输出设备端口
+	void closeMidiInPort();							// 关闭midi输入设备端口
+	void closeMidiOutPort();						// 关闭midi输出设备端口
 
-	void sendMessage(std::vector<unsigned char>* message);												// 发送midi消息
-	void sendMessage(std::vector<unsigned char>* message, unsigned int port);							// 发送midi消息
-	void sendMessage(std::vector<unsigned char>* message, RtMidiOut* midiout);							// 发送midi消息
-	void sendMessage(std::vector<unsigned char>* message, unsigned int port, RtMidiOut* midiout);		// 发送midi消息
+													// midi回调函数
+	static void midiCallback(double deltatime, std::vector<unsigned char>* message, void* userData);
+													// 向midi输出设备发送消息
+	void sendMidiOutMessage(unsigned char status, unsigned char data1, unsigned char data2);
 
-	static void midiCallback(double deltatime, std::vector<unsigned char>* message, void* userData);	// midi回调函数
-
-	void noteOn(Note& note, int velocity);			// 按下音符
-	void noteOff(Note& note, int velocity);			// 松开音符
 };

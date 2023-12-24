@@ -32,8 +32,8 @@
    <string>EPiano</string>
   </property>
   <property name="windowIcon">
-   <iconset>
-    <normaloff>piano.ico</normaloff>piano.ico</iconset>
+   <iconset resource="MainWin.qrc">
+    <normaloff>:/MainWin/data/piano.ico</normaloff>:/MainWin/data/piano.ico</iconset>
   </property>
   <property name="whatsThis">
    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;这是一款简易的钢琴模拟器&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>

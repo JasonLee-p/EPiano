@@ -1,7 +1,6 @@
 
 #include "MainWin.h"
-#include "chord.h"
-#include <QtGui/QOpenGLFunctions>
+
 
 
 MainWin::MainWin(QWidget *parent)
@@ -24,6 +23,7 @@ void MainWin::updatePressedKeysMessage() {
 		return;
 	}
 	// 获取当前按下的所有键
+	QMutexLocker locker(&mutex);  // 加锁
 	std::vector<Note*> pressedNotes;
 	for (auto& key : ui.pianoGLWin->pressedWkeys) {
 		pressedNotes.push_back(&key->note);

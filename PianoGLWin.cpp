@@ -1,9 +1,25 @@
 #include "PianoGLWin.h"
 
-#define CHECK_UPDATE if (updating) return; updating = true;
+#define CHECK_UPDATE if (updating) while (updating) {}; updating = true;
 #define END_UPDATE updating = false;
 constexpr auto PIANO_ORG_WIDTH = 1400;
 constexpr auto PIANO_ORG_HEIGHT = 140;
+
+
+
+std::map<int, int> keyMap = {
+	// G3 - G6
+	{Qt::Key_Z, 55},			{Qt::Key_S, 56},			{Qt::Key_X, 57},			{Qt::Key_D, 58},
+	{Qt::Key_C, 59},			{Qt::Key_V, 60},			{Qt::Key_G, 61},			{Qt::Key_B, 62},
+	{Qt::Key_H, 63},			{Qt::Key_N, 64},			{Qt::Key_M, 65},			{Qt::Key_K, 66},
+	{Qt::Key_Comma, 67},		{Qt::Key_L, 68},			{Qt::Key_Period, 69},		{Qt::Key_Semicolon, 70},
+	{Qt::Key_Slash, 71},		{Qt::Key_Q, 72},			{Qt::Key_2, 73},			{Qt::Key_W, 74},
+	{Qt::Key_3, 75},			{Qt::Key_E, 76},			{Qt::Key_R, 77},			{Qt::Key_5, 78},
+	{Qt::Key_T, 79},			{Qt::Key_6, 80},			{Qt::Key_Y, 81},			{Qt::Key_7, 82},
+	{Qt::Key_U, 83},			{Qt::Key_I, 84},			{Qt::Key_9, 85},			{Qt::Key_O, 86},
+	{Qt::Key_0, 87},			{Qt::Key_P, 88},			{Qt::Key_BracketLeft, 89},	{Qt::Key_Equal, 90},
+	{Qt::Key_BracketRight, 91},	{Qt::Key_Backspace, 92},	{Qt::Key_Backslash, 93},	{Qt::Key_AsciiTilde, 94}
+};
 
 
 PianoGLWin::PianoGLWin(QWidget* parent)
@@ -12,7 +28,8 @@ PianoGLWin::PianoGLWin(QWidget* parent)
 	setMouseTracking(true);
 }
 
-PianoGLWin::~PianoGLWin() {}
+PianoGLWin::~PianoGLWin() {
+}
 
 
 void PianoGLWin::initializeGL()
@@ -173,8 +190,22 @@ void PianoGLWin::drawKeyRange(QOpenGLBuffer* vbo, int start, int count, QVector4
 	vbo->bind();
 	program->enableAttributeArray(0);
 	program->setAttributeBuffer(0, GL_FLOAT, 0, 2, 0);
+
 	if (inLoop)  for (int i = 0; i < count; i += 4)	glDrawArrays(GL_TRIANGLE_STRIP, start + i, 4);
 	else glDrawArrays(GL_TRIANGLE_STRIP, start, count);
+
+	vbo->release();
+}
+
+void PianoGLWin::drawIndexs(QOpenGLBuffer* vbo, std::vector<int>& indexs, QVector4D color)
+{
+	program->setUniformValue(colorLocation, color);
+	vbo->bind();
+	program->enableAttributeArray(0);
+	program->setAttributeBuffer(0, GL_FLOAT, 0, 2, 0);
+
+	for (int i = 0; i < indexs.size(); i++) glDrawArrays(GL_TRIANGLE_STRIP, indexs[i] * 4, 4);
+
 	vbo->release();
 }
 
@@ -191,7 +222,11 @@ void PianoGLWin::paintPiano()
 		drawKeyRange(vbo_wk, mousePressedKey->index * 4, 4, WHITE_PRESSED);
 	}
 	if (pressedWkeys.size() > 0) {
-		// TODO
+		std::vector<int> indexs;
+		for (int i = 0; i < pressedWkeys.size(); i++) {
+			indexs.push_back(pressedWkeys[i]->index);
+		}
+		drawIndexs(vbo_wk, indexs, WHITE_PRESSED);
 	}
 
 	// 绘制白键边线
@@ -210,7 +245,11 @@ void PianoGLWin::paintPiano()
 		drawKeyRange(vbo_bk, mousePressedKey->index * 4, 4, BLACK_PRESSED);
 	}
 	if (pressedBkeys.size() > 0) {
-		// TODO
+		std::vector<int> indexs;
+		for (int i = 0; i < pressedBkeys.size(); i++) {
+			indexs.push_back(pressedBkeys[i]->index);
+		}
+		drawIndexs(vbo_bk, indexs, BLACK_PRESSED);
 	}
 }
 
@@ -314,11 +353,39 @@ void PianoGLWin::mouseReleaseEvent(QMouseEvent* event)
 	update();
 }
 
+void PianoGLWin::keyPressEvent(QKeyEvent* event)
+{
+	if (keyMap.find(event->key()) != keyMap.end()) {
+		int keyNumber = keyMap[event->key()];
+		Key* key = &keys[keyNumber - 21];
+		add_pressedKey(key);
+		key->play();
+	}
+	update();
+}
+
+void PianoGLWin::keyReleaseEvent(QKeyEvent* event)
+{
+	if (keyMap.find(event->key()) != keyMap.end()) {
+		int keyNumber = keyMap[event->key()];
+		Key* key = &keys[keyNumber - 21];
+		remove_pressedKey(key);
+		key->stop();
+	}
+	update();
+}
+
+void PianoGLWin::wheelEvent(QWheelEvent* event)
+{
+	// TODO
+}
+
 void PianoGLWin::add_pressedKey(Key* pressedKey)
 {
 	if (pressedKey == nullptr) {
 		throw std::runtime_error("PianoGLWin::add_pressedKey() : Empty pressedKey");
 	}
+	QMutexLocker locker(&mutex);  // 加锁
 	if (pressedKey->isWhite) {
 		pressedWkeys.push_back(pressedKey);
 	}
@@ -334,6 +401,7 @@ void PianoGLWin::remove_pressedKey(Key* pressedKey)
 	if (pressedKey == nullptr) {
 		throw std::runtime_error("PianoGLWin::remove_pressedKey() : Empty pressedKey");
 	}
+	QMutexLocker locker(&mutex);  // 加锁
 	if (pressedKey->isWhite) {
 		pressedWkeys.erase(std::remove(pressedWkeys.begin(), pressedWkeys.end(), pressedKey), pressedWkeys.end());
 	}
@@ -349,8 +417,8 @@ void PianoGLWin::add_pressedKeys(std::vector<Key*>& pressedKeys)
 	if (pressedKeys.size() == 0) {
 		throw std::runtime_error("PianoGLWin::add_pressedKeys() : Empty pressedKeys");
 	}
+	QMutexLocker locker(&mutex);  // 加锁
 	for (int i = 0; i < pressedKeys.size(); i++) {
-		std::cout << pressedKeys[i]->note.name << std::endl;
 		if (pressedKeys[i]->isWhite) {
 			pressedWkeys.push_back(pressedKeys[i]);
 		}
@@ -363,6 +431,7 @@ void PianoGLWin::add_pressedKeys(std::vector<Key*>& pressedKeys)
 
 void PianoGLWin::remove_pressedKeys(std::vector<Key*>& pressedKeys)
 {
+	QMutexLocker locker(&mutex);  // 加锁
 	for (int i = 0; i < pressedKeys.size(); i++) {
 		if (pressedKeys[i]->isWhite) {
 			pressedWkeys.erase(std::remove(pressedWkeys.begin(), pressedWkeys.end(), pressedKeys[i]), pressedWkeys.end());

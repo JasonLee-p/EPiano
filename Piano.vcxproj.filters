@@ -24,17 +24,20 @@
     <Filter Include="Resource Files\shader">
       <UniqueIdentifier>{51c71821-70a0-44c7-8782-32d42794053e}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\musicElements">
-      <UniqueIdentifier>{326d0d30-0101-444f-8077-72b9838e6028}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\musicElements">
-      <UniqueIdentifier>{edaa6bb3-9208-4504-8525-bb53d9942190}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Header Files\widgets">
       <UniqueIdentifier>{f7e445e8-1f87-4ca5-87c1-9657772279e6}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source Files\widgets">
       <UniqueIdentifier>{3a3b7657-310c-46cd-940f-6e1cc2d784b8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\generator">
+      <UniqueIdentifier>{3252ccbb-9bdb-4233-a40c-841b9154b86d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\packages">
+      <UniqueIdentifier>{da2c7ad9-925a-4b5b-9b41-a9171344c5dc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\packages">
+      <UniqueIdentifier>{44e1772d-e98c-42b3-9069-fefcf1f05e27}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -49,12 +52,6 @@
     <ClCompile Include="main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="key.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="note.cpp">
-      <Filter>Source Files\musicElements</Filter>
-    </ClCompile>
     <ClCompile Include="MainWin.cpp">
       <Filter>Source Files\widgets</Filter>
     </ClCompile>
@@ -64,30 +61,63 @@
     <ClCompile Include="midiDeviceHandler.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="packages\RtMidi.cpp">
+    <ClCompile Include="initStatic.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="chord.cpp">
-      <Filter>Source Files\musicElements</Filter>
+    <ClCompile Include="NotePlayer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Stk.cpp">
+      <Filter>Source Files\packages</Filter>
+    </ClCompile>
+    <ClCompile Include="packages\RtMidi.cpp">
+      <Filter>Source Files\packages</Filter>
+    </ClCompile>
+    <ClCompile Include="RtAudio.cpp">
+      <Filter>Source Files\packages</Filter>
+    </ClCompile>
+    <ClCompile Include="loadConfig.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="key.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="key.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="note.h">
-      <Filter>Header Files\musicElements</Filter>
-    </ClInclude>
-    <ClInclude Include="midiDeviceHandler.h">
+    <ClInclude Include="resource.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="packages\RtMidi.h">
+    <ClInclude Include="NotePlayer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="chord.h">
-      <Filter>Header Files\musicElements</Filter>
+    <ClInclude Include="music.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="loadConfig.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Envelope.h">
+      <Filter>Header Files\generator</Filter>
+    </ClInclude>
+    <ClInclude Include="SineWave.h">
+      <Filter>Header Files\generator</Filter>
+    </ClInclude>
+    <ClInclude Include="Stk.h">
+      <Filter>Header Files\packages</Filter>
     </ClInclude>
     <ClInclude Include="json.hpp">
+      <Filter>Header Files\packages</Filter>
+    </ClInclude>
+    <ClInclude Include="RtAudio.h">
+      <Filter>Header Files\packages</Filter>
+    </ClInclude>
+    <ClInclude Include="packages\RtMidi.h">
+      <Filter>Header Files\packages</Filter>
+    </ClInclude>
+    <ClInclude Include="threadPool.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -98,9 +128,18 @@
     <QtMoc Include="MainWin.h">
       <Filter>Header Files\widgets</Filter>
     </QtMoc>
+    <QtMoc Include="MyWidgets.h">
+      <Filter>Header Files\widgets</Filter>
+    </QtMoc>
+    <QtMoc Include="keysettingbutton.h">
+      <Filter>Header Files\widgets</Filter>
+    </QtMoc>
+    <QtMoc Include="midiDeviceHandler.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
   </ItemGroup>
   <ItemGroup>
-    <QtUic Include="oiSetting.ui">
+    <QtUic Include="SettingsWin.ui">
       <Filter>Form Files</Filter>
     </QtUic>
   </ItemGroup>
@@ -114,6 +153,17 @@
     <None Include="data\ChordAttr.json">
       <Filter>Resource Files</Filter>
     </None>
+    <None Include="data\config.json">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="data\config0.json">
+      <Filter>Resource Files</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="Piano.rc">
+      <Filter>Resource Files</Filter>
+    </ResourceCompile>
   </ItemGroup>
   <ItemGroup>
     <Image Include="data\piano.ico">

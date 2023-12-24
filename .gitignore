@@ -361,3 +361,8 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+/Piano1
+/EPiano/data/config.json
+/EPiano/EPiano.exe
+/EPiano/data/config.json
+/EPiano/EPiano.exe

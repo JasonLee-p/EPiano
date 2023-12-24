@@ -1,6 +1,9 @@
 <RCC>
     <qresource prefix="/MainWin">
+        <file>data/pianoLarger.png</file>
+        <file>data/piano.png</file>
         <file>data/chordAttr.json</file>
         <file>data/piano.ico</file>
+        <file>data/config.json</file>
     </qresource>
 </RCC>

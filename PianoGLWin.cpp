@@ -6,29 +6,24 @@ constexpr auto PIANO_ORG_WIDTH = 1400;
 constexpr auto PIANO_ORG_HEIGHT = 140;
 
 
-
-std::map<int, int> keyMap = {
-	// G3 - G6
-	{Qt::Key_Z, 55},			{Qt::Key_S, 56},			{Qt::Key_X, 57},			{Qt::Key_D, 58},
-	{Qt::Key_C, 59},			{Qt::Key_V, 60},			{Qt::Key_G, 61},			{Qt::Key_B, 62},
-	{Qt::Key_H, 63},			{Qt::Key_N, 64},			{Qt::Key_M, 65},			{Qt::Key_K, 66},
-	{Qt::Key_Comma, 67},		{Qt::Key_L, 68},			{Qt::Key_Period, 69},		{Qt::Key_Semicolon, 70},
-	{Qt::Key_Slash, 71},		{Qt::Key_Q, 72},			{Qt::Key_2, 73},			{Qt::Key_W, 74},
-	{Qt::Key_3, 75},			{Qt::Key_E, 76},			{Qt::Key_R, 77},			{Qt::Key_5, 78},
-	{Qt::Key_T, 79},			{Qt::Key_6, 80},			{Qt::Key_Y, 81},			{Qt::Key_7, 82},
-	{Qt::Key_U, 83},			{Qt::Key_I, 84},			{Qt::Key_9, 85},			{Qt::Key_O, 86},
-	{Qt::Key_0, 87},			{Qt::Key_P, 88},			{Qt::Key_BracketLeft, 89},	{Qt::Key_Equal, 90},
-	{Qt::Key_BracketRight, 91},	{Qt::Key_Backspace, 92},	{Qt::Key_Backslash, 93},	{Qt::Key_AsciiTilde, 94}
-};
-
-
 PianoGLWin::PianoGLWin(QWidget* parent)
 	: QOpenGLWidget(parent)
 {
+	connectMidiSignal();
 	setMouseTracking(true);
 }
 
 PianoGLWin::~PianoGLWin() {
+	// 释放Synth
+	delete Key::synth;
+	// 释放设备管理器
+	delete MidiDeviceHandler::currentHandler;
+	// 释放渲染资源
+	delete program;
+	delete vao;
+	delete vbo_bk;
+	delete vbo_wkLine;
+	delete vbo_wk;
 }
 
 
@@ -55,12 +50,12 @@ void PianoGLWin::initializeGL()
 
 	vbo_bk->bind();
 	program->enableAttributeArray(0);
-	program->setAttributeBuffer(0, GL_FLOAT, 0, 2, 0);  // Black keys
+	program->setAttributeBuffer(0, GL_FLOAT, 0, 2, 0);  // 黑键
 	vbo_bk->release();
 
 	vbo_wkLine->bind();
 	program->enableAttributeArray(0);
-	program->setAttributeBuffer(0, GL_FLOAT, 0, 2, 0);  // White key lines
+	program->setAttributeBuffer(0, GL_FLOAT, 0, 2, 0);  // 白键
 	vbo_wkLine->release();
 
 	vao->release();
@@ -297,7 +292,6 @@ void PianoGLWin::mouseMoveEvent(QMouseEvent* event)
 			// 更新被按下的键
 			if (tmp_key != nullptr) {
 				add_pressedKey(tmp_key);
-				tmp_key->play();
 			}
 			
 		}
@@ -306,6 +300,7 @@ void PianoGLWin::mouseMoveEvent(QMouseEvent* event)
 	}
 	// 鼠标左键未按下，更新悬浮的键
 	else {
+		if (mousePressedKey != nullptr) mousePressedKey->stop();
 		hoveredKey = tmp_key;
 		mousePressedKey = nullptr;
 	}
@@ -324,7 +319,6 @@ void PianoGLWin::mousePressEvent(QMouseEvent* event)
 			// 切换
 			mousePressedKey = hoveredKey;
 			hoveredKey = nullptr;
-			mousePressedKey->play();
 			// 更新被按下的键
 			add_pressedKey(mousePressedKey);
 		}
@@ -344,7 +338,6 @@ void PianoGLWin::mouseReleaseEvent(QMouseEvent* event)
 			// 更新被按下的键
 			remove_pressedKey(mousePressedKey);
 			// 切换
-			mousePressedKey->stop();
 			hoveredKey = mousePressedKey;
 			mousePressedKey = nullptr;
 		}
@@ -355,22 +348,27 @@ void PianoGLWin::mouseReleaseEvent(QMouseEvent* event)
 
 void PianoGLWin::keyPressEvent(QKeyEvent* event)
 {
-	if (keyMap.find(event->key()) != keyMap.end()) {
-		int keyNumber = keyMap[event->key()];
+	if (LoadConfig::KEYMAP.find(event->key()) != LoadConfig::KEYMAP.end() && event->isAutoRepeat() == false) {
+		int keyNumber = LoadConfig::KEYMAP[event->key()];
+		if (keyNumber == NONE_NOTE) return;
 		Key* key = &keys[keyNumber - 21];
-		add_pressedKey(key);
-		key->play();
+		// 如果已经在被按下的键中，不再重复添加
+		if (std::find(pressedWkeys.begin(), pressedWkeys.end(), key) != pressedWkeys.end() ||
+			std::find(pressedBkeys.begin(), pressedBkeys.end(), key) != pressedBkeys.end()) {
+			return;
+		}
+		else add_pressedKey(key);
 	}
 	update();
 }
 
 void PianoGLWin::keyReleaseEvent(QKeyEvent* event)
 {
-	if (keyMap.find(event->key()) != keyMap.end()) {
-		int keyNumber = keyMap[event->key()];
+	if (LoadConfig::KEYMAP.find(event->key()) != LoadConfig::KEYMAP.end()) {
+		int keyNumber = LoadConfig::KEYMAP[event->key()];
+		if (keyNumber == NONE_NOTE) return;
 		Key* key = &keys[keyNumber - 21];
 		remove_pressedKey(key);
-		key->stop();
 	}
 	update();
 }
@@ -380,19 +378,42 @@ void PianoGLWin::wheelEvent(QWheelEvent* event)
 	// TODO
 }
 
+void PianoGLWin::connectMidiSignal() {
+	// 链接midi信号到add_pressedKey()和remove_pressedKey()
+	connect(MidiDeviceHandler::currentHandler, &MidiDeviceHandler::sendNoteOnMessage, this, 
+		[=](unsigned int keyNumber, unsigned int velocity) {
+			if (keyNumber >= 21 && keyNumber <= 108) {
+				Key* key = &keys[keyNumber - 21];
+				add_pressedKey(key);
+			}
+		}
+	);
+	connect(MidiDeviceHandler::currentHandler, &MidiDeviceHandler::sendNoteOffMessage, this,
+		[=](unsigned int keyNumber, unsigned int velocity) {
+			if (keyNumber >= 21 && keyNumber <= 108) {
+				Key* key = &keys[keyNumber - 21];
+				remove_pressedKey(key);
+			}
+		}
+	);
+}
+
 void PianoGLWin::add_pressedKey(Key* pressedKey)
 {
+	// 在此函数，即使已经在被按下的键中，也会开始播放，但不添加到pressedWkeys和pressedBkeys中
 	if (pressedKey == nullptr) {
 		throw std::runtime_error("PianoGLWin::add_pressedKey() : Empty pressedKey");
 	}
-	QMutexLocker locker(&mutex);  // 加锁
-	if (pressedKey->isWhite) {
+	QMutexLocker locker(&mutex);
+	if (pressedKey->isWhite && std::find(pressedWkeys.begin(), pressedWkeys.end(), pressedKey) == pressedWkeys.end()) {
 		pressedWkeys.push_back(pressedKey);
 	}
-	else {
+	else if (!pressedKey->isWhite && std::find(pressedBkeys.begin(), pressedBkeys.end(), pressedKey) == pressedBkeys.end()) {
 		pressedBkeys.push_back(pressedKey);
 	}
-	emit updatePressedKeysMessage();
+	pressedKey->play();
+	emit updatePressedKeysMessage(); // 发送给MainWin
+	this->update();
 }
 
 
@@ -402,13 +423,15 @@ void PianoGLWin::remove_pressedKey(Key* pressedKey)
 		throw std::runtime_error("PianoGLWin::remove_pressedKey() : Empty pressedKey");
 	}
 	QMutexLocker locker(&mutex);  // 加锁
+	pressedKey->stop();
 	if (pressedKey->isWhite) {
 		pressedWkeys.erase(std::remove(pressedWkeys.begin(), pressedWkeys.end(), pressedKey), pressedWkeys.end());
 	}
 	else {
 		pressedBkeys.erase(std::remove(pressedBkeys.begin(), pressedBkeys.end(), pressedKey), pressedBkeys.end());
 	}
-	emit updatePressedKeysMessage();
+	emit updatePressedKeysMessage(); // 发送给MainWin
+	this->update();
 }
 
 
@@ -419,6 +442,7 @@ void PianoGLWin::add_pressedKeys(std::vector<Key*>& pressedKeys)
 	}
 	QMutexLocker locker(&mutex);  // 加锁
 	for (int i = 0; i < pressedKeys.size(); i++) {
+		pressedKeys[i]->play();
 		if (pressedKeys[i]->isWhite) {
 			pressedWkeys.push_back(pressedKeys[i]);
 		}
@@ -433,6 +457,7 @@ void PianoGLWin::remove_pressedKeys(std::vector<Key*>& pressedKeys)
 {
 	QMutexLocker locker(&mutex);  // 加锁
 	for (int i = 0; i < pressedKeys.size(); i++) {
+		pressedKeys[i]->stop();
 		if (pressedKeys[i]->isWhite) {
 			pressedWkeys.erase(std::remove(pressedWkeys.begin(), pressedWkeys.end(), pressedKeys[i]), pressedWkeys.end());
 		}

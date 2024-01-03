@@ -93,13 +93,13 @@ color: rgb(0, 4, 39);</string>
         <number>0</number>
        </property>
        <property name="leftMargin">
-        <number>45</number>
+        <number>30</number>
        </property>
        <property name="topMargin">
         <number>10</number>
        </property>
        <property name="rightMargin">
-        <number>45</number>
+        <number>35</number>
        </property>
        <property name="bottomMargin">
         <number>0</number>
@@ -137,15 +137,21 @@ color: rgb(0, 4, 39);</string>
           <item>
            <widget class="QWidget" name="noteResult" native="true">
             <property name="sizePolicy">
-             <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+             <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
               <horstretch>0</horstretch>
               <verstretch>0</verstretch>
              </sizepolicy>
             </property>
             <property name="minimumSize">
              <size>
-              <width>165</width>
+              <width>240</width>
               <height>0</height>
+             </size>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>240</width>
+              <height>16777215</height>
              </size>
             </property>
             <property name="sizeIncrement">
@@ -183,10 +189,10 @@ border-radius: 15px;
               <number>10</number>
              </property>
              <property name="rightMargin">
-              <number>22</number>
+              <number>0</number>
              </property>
              <property name="bottomMargin">
-              <number>12</number>
+              <number>10</number>
              </property>
              <item>
               <widget class="QLabel" name="currentNotes">
@@ -226,7 +232,7 @@ border-radius: 15px;
             </property>
             <property name="minimumSize">
              <size>
-              <width>30</width>
+              <width>25</width>
               <height>0</height>
              </size>
             </property>
@@ -1252,7 +1258,7 @@ QSlider::add-page:vertical, QScrollBar::sub-page:vertical {
            <number>0</number>
           </property>
           <property name="topMargin">
-           <number>25</number>
+           <number>20</number>
           </property>
           <property name="rightMargin">
            <number>0</number>

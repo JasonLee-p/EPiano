@@ -162,7 +162,6 @@
   <ItemGroup>
     <None Include="data\ChordAttr.json" />
     <None Include="data\config.json" />
-    <None Include="data\config0.json" />
     <None Include="shader\fragment.glsl" />
     <None Include="shader\vertex.glsl" />
   </ItemGroup>

@@ -8,6 +8,7 @@ int main(int argc, char *argv[])
     SynthNote::initAllSynthWaves();
     Key::synth = new Synth();
     QApplication a(argc, argv);
+    LoadConfig config;
     MainWin w;
     Music::Chord::readChordAttr(w.statusBar());
     w.show();
